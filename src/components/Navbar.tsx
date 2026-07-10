@@ -1,0 +1,183 @@
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X, Phone, ShoppingBag } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const navLinks = [
+  { name: "HOME", path: "/" },
+  { name: "MENU", path: "/menu" },
+  { name: "ABOUT", path: "/about" },
+  { name: "GALLERY", path: "/gallery" },
+  { name: "REVIEWS", path: "/reviews" },
+  { name: "CONTACT", path: "/contact" }
+];
+
+export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled 
+            ? "glass-panel py-3.5 shadow-md border-b border-brand-gold/15" 
+            : "bg-transparent py-5"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* Logo Section */}
+            <Link to="/" className="flex items-center space-x-3 group">
+              {/* Circular Gold Seal Logo */}
+              <div className="w-10 h-10 rounded-full bg-brand-dark border-2 border-brand-gold flex items-center justify-center shadow-md relative overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                <svg className="w-8 h-8 text-brand-gold fill-brand-gold" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="#D4AF37" strokeWidth="2" strokeDasharray="3 3" />
+                  <path d="M50 20 L55 33 L69 33 L58 41 L62 55 L50 47 L38 55 L42 41 L31 33 L45 33 Z" />
+                  <text x="50" y="70" textAnchor="middle" fontSize="12" fontWeight="black" fill="#D4AF37" fontFamily="monospace" letterSpacing="1">SKD</text>
+                  <text x="50" y="80" textAnchor="middle" fontSize="6" fontWeight="bold" fill="#D4AF37" fontFamily="sans-serif">ESTD 1998</text>
+                </svg>
+              </div>
+
+              <div className="flex flex-col">
+                <span className="font-display font-black text-sm sm:text-base tracking-wider text-brand-dark leading-tight uppercase group-hover:text-brand-accent transition-colors duration-300">
+                  SRI KRISHNA FAMILY DHABA
+                </span>
+                <span className="font-telugu text-[9px] text-brand-accent font-semibold tracking-wider -mt-0.5">
+                  శ్రీ కృష్ణ ఫ్యామిలీ ధాబ
+                </span>
+              </div>
+            </Link>
+
+            {/* Desktop Links (Centered Layout) */}
+            <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`relative text-[11px] xl:text-xs font-bold tracking-widest transition-colors duration-300 py-1 ${
+                      isActive 
+                        ? "text-brand-gold" 
+                        : "text-brand-dark/85 hover:text-brand-gold"
+                    }`}
+                  >
+                    {link.name}
+                    {isActive && (
+                      <motion.div
+                        layoutId="nav-underline"
+                        className="absolute bottom-[-6px] left-0 right-0 h-[2px] bg-brand-gold"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Right Side Buttons (Call Now & Order Online) */}
+            <div className="hidden md:flex items-center space-x-4 shrink-0">
+              {/* Call Now Outline Button */}
+              <a
+                href="tel:+919032292421"
+                className="flex items-center gap-1.5 border border-brand-dark/40 hover:border-brand-dark text-brand-dark hover:bg-brand-dark hover:text-brand-bg text-[10px] xl:text-xs font-bold tracking-widest uppercase px-5 py-2.5 rounded-full transition-all duration-300 shadow-sm"
+              >
+                <Phone size={13} />
+                <span>Call Now</span>
+              </a>
+
+              {/* Order Online Filled Button */}
+              <Link
+                to="/menu"
+                className="flex items-center gap-1.5 bg-brand-gold hover:bg-brand-dark text-brand-dark hover:text-brand-bg text-[10px] xl:text-xs font-bold tracking-widest uppercase px-5 py-2.5 rounded-full transition-all duration-300 shadow-md border border-brand-gold/10"
+              >
+                <ShoppingBag size={13} />
+                <span>Order Online</span>
+              </Link>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="lg:hidden flex items-center space-x-4">
+              <a
+                href="tel:+919032292421"
+                className="md:hidden flex items-center justify-center w-8 h-8 rounded-full bg-brand-accent/10 text-brand-accent hover:bg-brand-accent hover:text-brand-bg transition-colors"
+                aria-label="Call Now"
+              >
+                <Phone size={14} />
+              </a>
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="text-brand-dark hover:text-brand-accent p-2 focus:outline-none transition-colors duration-300"
+                aria-label="Toggle Menu"
+              >
+                {isOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Menu Drawer */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-x-0 top-[60px] z-40 lg:hidden glass-panel shadow-2xl border-b border-brand-gold/25"
+          >
+            <div className="px-4 pt-3 pb-6 space-y-2.5">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setIsOpen(false)}
+                    className={`block px-4 py-2.5 rounded-xl text-xs font-bold tracking-widest uppercase transition-all duration-300 ${
+                      isActive
+                        ? "bg-brand-gold text-brand-dark shadow-md"
+                        : "text-brand-dark hover:bg-brand-accent/10 hover:text-brand-accent"
+                    }`}
+                  >
+                    <span>{link.name}</span>
+                  </Link>
+                );
+              })}
+              
+              <div className="pt-4 border-t border-brand-dark/10 px-2 flex flex-col gap-3">
+                <a
+                  href="tel:+919032292421"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full flex items-center justify-center gap-1.5 border border-brand-dark text-brand-dark hover:bg-brand-dark hover:text-brand-bg text-[10px] font-bold tracking-widest uppercase py-3 rounded-full transition-all duration-300"
+                >
+                  <Phone size={14} />
+                  <span>Call Now</span>
+                </a>
+                <Link
+                  to="/menu"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full flex items-center justify-center gap-1.5 bg-brand-gold text-brand-dark text-[10px] font-bold tracking-widest uppercase py-3 rounded-full transition-all duration-300 shadow-md"
+                >
+                  <ShoppingBag size={14} />
+                  <span>Order Online</span>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}

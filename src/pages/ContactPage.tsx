@@ -1,0 +1,313 @@
+import { useState } from "react";
+import { Phone, Mail, MessageCircle, ArrowRight, MapPin, Clock } from "lucide-react";
+
+interface Branch {
+  id: string;
+  name: string;
+  address: string;
+  phone: string;
+  hours: string;
+  mapSrc: string;
+  googleMapsUrl: string;
+}
+
+const branches: Branch[] = [
+  {
+    id: "chinthal",
+    name: "Sri Krishna Dhaba - Chinthal",
+    address:
+      "2nd floor, HMT Rd, above The Kakatiya Co-operative Bank.LTD, beside Ridge Towers, Chinthal, Quthbullapur, Hyderabad, Telangana 500037",
+    phone: "+91 90322 92421",
+    hours: "Mon – Sun: 11:30 AM – 11:45 PM",
+    mapSrc:
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3805.301124844372!2d78.4485542!3d17.4931326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb910db054e0ad%3A0x6e289d0b6a6c23b2!2sSRI%20KRISHNA%20FAMILY%20DHABA!5e0!3m2!1sen!2sin!4v1704481029192!5m2!1sen!2sin",
+    googleMapsUrl: "https://maps.google.com/?q=SRI+KRISHNA+FAMILY+DHABA+Chinthal+Hyderabad"
+  },
+  {
+    id: "aziznagar",
+    name: "Sri Krishna Dhaba - Aziz Nagar",
+    address:
+      "4-15/2part, Aziz Nagar, Himayat Sagar Rd, Moinabad, Aziz Nagar, Himayat Sagar Rd, Moinabad, Telangana 500075",
+    phone: "+91 90322 92421",
+    hours: "Mon – Sun: 11:00 AM – 11:30 PM",
+    mapSrc:
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3808.7!2d78.35!3d17.35!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTfCsDIxJzAwLjAiTiA3OMKwMjEnMDAuMCJF!5e0!3m2!1sen!2sin!4v1704481029192!5m2!1sen!2sin",
+    googleMapsUrl: "https://maps.google.com/?q=Sri+Krishna+Family+Dhaba+Aziz+Nagar+Moinabad+Telangana"
+  }
+];
+
+export default function ContactPage() {
+  const [activeBranch, setActiveBranch] = useState<string>("chinthal");
+
+  const currentBranch = branches.find((b) => b.id === activeBranch)!;
+
+  return (
+    <div className="min-h-screen pt-28 pb-20 relative bg-brand-bg">
+      {/* Noise Overlay */}
+      <div className="noise-overlay" />
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Header */}
+        <div className="text-center mb-16 space-y-2">
+          <span className="text-[11px] font-extrabold uppercase tracking-widest text-brand-accent">
+            GET IN TOUCH
+          </span>
+          <h1 className="font-display font-bold text-4xl sm:text-5xl text-brand-dark relative pb-4 inline-block">
+            Contact Us
+            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-brand-accent rounded-full" />
+          </h1>
+        </div>
+
+        {/* Two-Column Grid: Contact Cards + Order Online */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mt-8">
+          {/* Left Column: Grid of Contact Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* WhatsApp */}
+            <a
+              href="https://wa.me/919032292421"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-2xl p-6 shadow-sm border border-brand-gold/10 hover:shadow-md transition-all duration-300 flex flex-col items-center text-center group"
+            >
+              <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <MessageCircle size={22} className="fill-emerald-500/10" />
+              </div>
+              <h3 className="font-sans font-bold text-brand-dark text-sm">WhatsApp</h3>
+              <p className="text-xs text-brand-dark/50 mt-1">Chat with us</p>
+            </a>
+
+            {/* Instagram */}
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-2xl p-6 shadow-sm border border-brand-gold/10 hover:shadow-md transition-all duration-300 flex flex-col items-center text-center group"
+            >
+              <div className="w-12 h-12 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                </svg>
+              </div>
+              <h3 className="font-sans font-bold text-brand-dark text-sm">Instagram</h3>
+              <p className="text-xs text-brand-dark/50 mt-1">Follow updates</p>
+            </a>
+
+            {/* Facebook */}
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-2xl p-6 shadow-sm border border-brand-gold/10 hover:shadow-md transition-all duration-300 flex flex-col items-center text-center group"
+            >
+              <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                </svg>
+              </div>
+              <h3 className="font-sans font-bold text-brand-dark text-sm">Facebook</h3>
+              <p className="text-xs text-brand-dark/50 mt-1">Join community</p>
+            </a>
+
+            {/* Call Us */}
+            <a
+              href="tel:+919032292421"
+              className="bg-white rounded-2xl p-6 shadow-sm border border-brand-gold/10 hover:shadow-md transition-all duration-300 flex flex-col items-center text-center group"
+            >
+              <div className="w-12 h-12 rounded-full bg-amber-50 text-brand-gold flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Phone size={20} className="fill-brand-gold/10" />
+              </div>
+              <h3 className="font-sans font-bold text-brand-dark text-sm">Call Us</h3>
+              <p className="text-xs text-brand-accent font-bold mt-1">+91 90322 92421</p>
+            </a>
+
+            {/* Mail Us */}
+            <a
+              href="mailto:contact@srikrishnadhaba.com"
+              className="bg-white rounded-2xl p-6 shadow-sm border border-brand-gold/10 hover:shadow-md transition-all duration-300 flex flex-col items-center text-center sm:col-span-2 group"
+            >
+              <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Mail size={20} />
+              </div>
+              <h3 className="font-sans font-bold text-brand-dark text-sm">Mail Us</h3>
+              <p className="text-xs text-brand-dark/65 mt-1 font-medium">contact@srikrishnadhaba.com</p>
+            </a>
+          </div>
+
+          {/* Right Column: Order Online Delivery */}
+          <div className="space-y-6 flex flex-col justify-center h-full">
+            <div className="flex items-center gap-2">
+              <span className="w-6 h-0.5 bg-brand-accent inline-block" />
+              <span className="text-[11px] font-extrabold uppercase tracking-widest text-brand-accent">
+                ORDER ONLINE
+              </span>
+            </div>
+
+            <div>
+              <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-brand-dark leading-tight">
+                Sri Krishna Flavors
+              </h2>
+              <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-brand-gold leading-none mt-1">
+                at Your Doorstep
+              </h2>
+            </div>
+
+            <div className="space-y-4 pt-2">
+              {/* Zomato */}
+              <a
+                href="https://zomato.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between bg-white rounded-2xl p-5 shadow-sm border-l-4 border-red-500 hover:shadow-md transition-shadow group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 font-bold flex items-center justify-center text-lg select-none">z</div>
+                  <div>
+                    <h4 className="font-sans font-bold text-brand-dark text-sm">Zomato</h4>
+                    <p className="text-[10px] text-brand-dark/45">Official Partner</p>
+                  </div>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-brand-bg flex items-center justify-center text-brand-dark group-hover:bg-brand-dark group-hover:text-brand-bg transition-colors">
+                  <ArrowRight size={14} />
+                </div>
+              </a>
+
+              {/* Swiggy */}
+              <a
+                href="https://swiggy.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between bg-white rounded-2xl p-5 shadow-sm border-l-4 border-orange-500 hover:shadow-md transition-shadow group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-orange-50 text-orange-500 font-bold flex items-center justify-center text-lg select-none">s</div>
+                  <div>
+                    <h4 className="font-sans font-bold text-brand-dark text-sm">Swiggy</h4>
+                    <p className="text-[10px] text-brand-dark/45">Official Partner</p>
+                  </div>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-brand-bg flex items-center justify-center text-brand-dark group-hover:bg-brand-dark group-hover:text-brand-bg transition-colors">
+                  <ArrowRight size={14} />
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* ──────────── VISIT OUR BRANCHES SECTION ──────────── */}
+        <div className="mt-24">
+          {/* Section Header */}
+          <div className="text-center mb-10 space-y-2">
+            <span className="text-[11px] font-extrabold uppercase tracking-widest text-brand-accent">
+              FIND US NEAR YOU
+            </span>
+            <h2 className="font-display font-bold text-3xl sm:text-4xl text-brand-dark">
+              Visit Our Branches
+            </h2>
+          </div>
+
+          {/* Tab Buttons */}
+          <div className="flex flex-wrap gap-2 justify-center mb-10">
+            {branches.map((branch) => (
+              <button
+                key={branch.id}
+                onClick={() => setActiveBranch(branch.id)}
+                className={`px-6 py-3 rounded-xl text-xs font-bold tracking-wider uppercase transition-all duration-300 border ${
+                  activeBranch === branch.id
+                    ? "bg-brand-accent text-white border-brand-accent shadow-md"
+                    : "bg-white text-brand-dark border-brand-gold/15 hover:border-brand-accent/40"
+                }`}
+              >
+                {branch.id === "chinthal" ? "Chinthal" : "Aziz Nagar"}
+              </button>
+            ))}
+          </div>
+
+          {/* Branch Details + Map Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            {/* Left: Branch Info Card */}
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-brand-gold/10 flex flex-col justify-between">
+              <div className="space-y-6">
+                <h3 className="font-display font-bold text-xl text-brand-dark">
+                  {currentBranch.name}
+                </h3>
+
+                {/* Address (Clickable → Google Maps) */}
+                <a
+                  href={currentBranch.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-4 group/addr cursor-pointer"
+                >
+                  <div className="w-9 h-9 rounded-full bg-brand-accent/10 flex items-center justify-center text-brand-accent shrink-0 mt-0.5 group-hover/addr:bg-brand-accent group-hover/addr:text-white transition-colors duration-300">
+                    <MapPin size={16} />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-brand-accent uppercase tracking-wider">Address</h4>
+                    <p className="text-xs sm:text-sm text-brand-dark/75 leading-relaxed mt-1 group-hover/addr:text-brand-accent transition-colors duration-300">
+                      {currentBranch.address}
+                    </p>
+                    <span className="text-[10px] text-brand-accent/70 mt-1 inline-block underline underline-offset-2">
+                      View on Google Maps →
+                    </span>
+                  </div>
+                </a>
+
+                {/* Phone */}
+                <div className="flex items-start gap-4">
+                  <div className="w-9 h-9 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold shrink-0 mt-0.5">
+                    <Phone size={16} />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-brand-accent uppercase tracking-wider">Phone</h4>
+                    <a href={`tel:${currentBranch.phone.replace(/\s/g, "")}`} className="text-sm text-brand-dark font-semibold hover:text-brand-accent transition-colors mt-1 block">
+                      {currentBranch.phone}
+                    </a>
+                  </div>
+                </div>
+
+                {/* Hours */}
+                <div className="flex items-start gap-4">
+                  <div className="w-9 h-9 rounded-full bg-brand-olive/10 flex items-center justify-center text-brand-olive shrink-0 mt-0.5">
+                    <Clock size={16} />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-brand-accent uppercase tracking-wider">Hours</h4>
+                    <p className="text-sm text-brand-dark/80 mt-1">
+                      {currentBranch.hours}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Get Directions CTA */}
+              <a
+                href={currentBranch.googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-8 flex items-center justify-center gap-2 bg-brand-accent hover:bg-brand-dark text-brand-bg text-xs font-bold tracking-widest uppercase py-3.5 rounded-xl shadow-md transition-all duration-300"
+              >
+                <MapPin size={14} />
+                <span>Get Directions</span>
+              </a>
+            </div>
+
+            {/* Right: Google Maps Embed */}
+            <div className="h-[350px] lg:h-auto min-h-[350px] rounded-3xl overflow-hidden border border-brand-gold/10 shadow-sm bg-white">
+              <iframe
+                key={currentBranch.id}
+                title={`${currentBranch.name} Map`}
+                src={currentBranch.mapSrc}
+                className="w-full h-full border-0"
+                allowFullScreen={false}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
