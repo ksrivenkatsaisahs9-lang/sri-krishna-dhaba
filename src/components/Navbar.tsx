@@ -98,7 +98,7 @@ export default function Navbar() {
             </div>
 
             {/* Right Side Buttons (Call Now, Book Table & Order Online) */}
-            <div className="hidden md:flex items-center space-x-3 shrink-0">
+            <div className="hidden md:flex items-center space-x-4 xl:space-x-5 shrink-0">
               {/* Call Now Outline Button */}
               <a
                 href={`tel:${cleanPhone}`}
