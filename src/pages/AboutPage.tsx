@@ -62,7 +62,7 @@ export default function AboutPage() {
               A Culinary Sanctuary Built On Family Trust
             </h2>
             <p className="text-sm text-brand-dark/75 leading-relaxed font-sans">
-              Founded with a dream to provide a premium dining experience that feels like a home-cooked meal, Sri Krishna Family Dhaba has stood as a beacon of delicious vegetarian food in Chinthal, Hyderabad.
+              Founded with a dream to provide a premium dining experience that feels like a home-cooked meal, Sri Krishna Family Dhaba has stood as a beacon of delicious vegetarian food in Pragathi Nagar, Hyderabad.
             </p>
             <p className="text-sm text-brand-dark/75 leading-relaxed font-sans">
               Inspired by the spiritual purity of traditional Indian cooking and localized Hyderabadi preferences, our menu blends fiery rustic dhaba spices with high-end culinary plating. We source all raw items daily from local farmer markets, ensuring that only the freshest green produce, clean cashews, and soft paneer reach your plates.

@@ -34,7 +34,7 @@ export default function Footer() {
             </Link>
 
             <p className="text-xs sm:text-sm leading-relaxed text-brand-bg/75 font-sans">
-              Serving the finest vegetarian culinary delights in Chinthal. Famous for our Butter Naan, Paneer Biryani, and welcoming atmosphere.
+              Serving the finest vegetarian culinary delights in Pragathi Nagar. Famous for our Butter Naan, Paneer Biryani, and welcoming atmosphere.
             </p>
 
             {/* Social Media Circular Buttons Grid */}
@@ -139,15 +139,15 @@ export default function Footer() {
             </h3>
             <div className="space-y-4 text-xs sm:text-sm">
               <a
-                href="https://maps.google.com/?q=SRI+KRISHNA+FAMILY+DHABA+Chinthal+Hyderabad"
+                href="https://www.google.com/maps/place/Sri+Krishna+Family+Dhaba/@17.5254461,78.3950244,17z/data=!3m1!4b1!4m6!3m5!1s0x3bcb8f0052362da1:0xd093fe41bf080e4d!8m2!3d17.5254461!4d78.3950244!16s%2Fg%2F11wvt0qq4l"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-start space-x-2 group/branch hover:text-brand-gold transition-colors duration-200 block"
               >
                 <MapPin size={16} className="text-brand-gold shrink-0 mt-0.5 group-hover/branch:scale-110 transition-transform" />
                 <div>
-                  <p className="font-bold text-white group-hover/branch:text-brand-gold">Chinthal Branch</p>
-                  <p className="text-brand-bg/65 text-[11px] leading-tight mt-0.5">2nd floor, HMT Rd, above Kakatiya Bank, Hyderabad</p>
+                  <p className="font-bold text-white group-hover/branch:text-brand-gold">Pragathi Nagar Branch</p>
+                  <p className="text-brand-bg/65 text-[11px] leading-tight mt-0.5">A/1, Bajrang Towers, Pragathi Nagar, Nizampet, Hyderabad</p>
                 </div>
               </a>
               <a

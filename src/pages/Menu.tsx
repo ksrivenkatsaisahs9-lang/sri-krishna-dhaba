@@ -1,20 +1,37 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Search, SlidersHorizontal, Star, Sparkles, ReceiptText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import DishCard from "../components/DishCard";
+import { getNumericPrice } from "../utils/menuHelpers";
 import { menuData } from "../utils/menuData";
 
 const categories = [
   "All",
-  "Soups",
-  "Starters",
-  "Special Starters",
-  "65 Specials",
-  "Veg Curries",
-  "Rotis/Breads",
-  "Biryanis",
-  "Desserts",
-  "Beverages"
+  "SOUPS",
+  "STARTERS",
+  "SPL. STARTERS",
+  "65' KI PASAND",
+  "CURIES",
+  "SPL. PANEER CURRIES",
+  "SPL. VEG. CURRIES",
+  "CHINESE",
+  "SALAD",
+  "DAL BAHAR",
+  "KOFTA KI CURRIES",
+  "CURRIES",
+  "ROTI",
+  "NAAN",
+  "PARATHA in TANDOOR",
+  "RICE",
+  "FRIED RICE",
+  "PULLAW",
+  "BIRYANI",
+  "PAPAD",
+  "RAITA",
+  "SOFT DRINKS",
+  "JUMBO FAMILY PACK",
+  "COMBO FAMILY PACK"
 ];
 
 export default function Menu() {
@@ -24,14 +41,13 @@ export default function Menu() {
   const [showChefSpecialsOnly, setShowChefSpecialsOnly] = useState(false);
   const [showHighRatingOnly, setShowHighRatingOnly] = useState(false);
 
-  // Filter and sort items
-  const filteredDishes = useMemo(() => {
-    let result = [...menuData];
+  const categoryTabContainerRef = useRef<HTMLDivElement>(null);
+  const isScrollingProgrammatically = useRef(false);
+  const scrollTimeout = useRef<number | null>(null);
 
-    // Filter by Category
-    if (selectedCategory !== "All") {
-      result = result.filter((dish) => dish.category === selectedCategory);
-    }
+  // Filter and sort items (ignoring selectedCategory filter for unified display)
+  const allFilteredDishes = useMemo(() => {
+    let result = [...menuData];
 
     // Filter by Search Query
     if (searchQuery.trim() !== "") {
@@ -56,15 +72,129 @@ export default function Menu() {
 
     // Sorting
     if (sortBy === "price-asc") {
-      result.sort((a, b) => a.price - b.price);
+      result.sort((a, b) => getNumericPrice(a.price) - getNumericPrice(b.price));
     } else if (sortBy === "price-desc") {
-      result.sort((a, b) => b.price - a.price);
+      result.sort((a, b) => getNumericPrice(b.price) - getNumericPrice(a.price));
     } else if (sortBy === "rating") {
       result.sort((a, b) => b.rating - a.rating);
     }
 
     return result;
-  }, [searchQuery, selectedCategory, sortBy, showChefSpecialsOnly, showHighRatingOnly]);
+  }, [searchQuery, sortBy, showChefSpecialsOnly, showHighRatingOnly]);
+
+  // Group dishes by category
+  const groupedDishes = useMemo(() => {
+    const groups: { [key: string]: typeof menuData } = {};
+    allFilteredDishes.forEach((dish) => {
+      if (!groups[dish.category]) {
+        groups[dish.category] = [];
+      }
+      groups[dish.category].push(dish);
+    });
+    return groups;
+  }, [allFilteredDishes]);
+
+  // Handle Category click / smooth scroll
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(category);
+    isScrollingProgrammatically.current = true;
+    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+
+    const onScrollEnd = () => {
+      isScrollingProgrammatically.current = false;
+    };
+
+    if (category === "All") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollTimeout.current = window.setTimeout(onScrollEnd, 850);
+    } else {
+      const elementId = `category-section-${category.replace(/\s+/g, '-').replace(/'/g, '')}`;
+      const element = document.getElementById(elementId);
+      if (element) {
+        const yOffset = -205; 
+        const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+        scrollTimeout.current = window.setTimeout(onScrollEnd, 850);
+      } else {
+        isScrollingProgrammatically.current = false;
+      }
+    }
+  };
+
+  // Scroll spy effect to highlight active category
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isScrollingProgrammatically.current) return;
+
+      if (window.scrollY < 120) {
+        setSelectedCategory("All");
+        return;
+      }
+
+      let currentCategory = "All";
+      const activeCategories = categories.filter((c) => c !== "All");
+
+      for (const category of activeCategories) {
+        const elementId = `category-section-${category.replace(/\s+/g, '-').replace(/'/g, '')}`;
+        const element = document.getElementById(elementId);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          // If the top of the category section is within view range
+          if (rect.top <= 240) {
+            currentCategory = category;
+          }
+        }
+      }
+
+      setSelectedCategory(currentCategory);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  // Center active category button in the horizontal scroll container
+  useEffect(() => {
+    const container = categoryTabContainerRef.current;
+    if (!container) return;
+
+    const activeButton = container.querySelector(`[data-category="${selectedCategory}"]`) as HTMLElement;
+    if (activeButton) {
+      const containerWidth = container.offsetWidth;
+      const buttonOffsetLeft = activeButton.offsetLeft;
+      const buttonWidth = activeButton.offsetWidth;
+
+      const scrollLeft = buttonOffsetLeft - containerWidth / 2 + buttonWidth / 2;
+      container.scrollTo({ left: scrollLeft, behavior: "smooth" });
+    }
+  }, [selectedCategory]);
+
+  // Handle direct scroll redirect to a specific item from URL params
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const itemId = params.get("item");
+    if (itemId) {
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`dish-item-${itemId}`);
+        if (element) {
+          const yOffset = -225; // Align perfectly under the sticky category header
+          const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+          window.scrollTo({ top: y, behavior: "smooth" });
+
+          // Flash highlight ring around the selected item
+          element.classList.add("ring-2", "ring-brand-accent", "ring-offset-2", "transition-all", "duration-1000");
+          setTimeout(() => {
+            element.classList.remove("ring-2", "ring-brand-accent", "ring-offset-2");
+          }, 3000);
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [location]);
 
   return (
     <div className="min-h-screen pt-28 pb-20 relative bg-brand-bg/30">
@@ -148,13 +278,21 @@ export default function Menu() {
               </button>
             </div>
           </div>
+        </div>
 
-          {/* Categories Tab Bar */}
-          <div className="flex overflow-x-auto pb-3 gap-2 scrollbar-thin scrollbar-thumb-brand-accent/60 scrollbar-track-transparent">
+        {/* Sticky Categories Tab Bar */}
+        <div
+          className="sticky top-[70px] lg:top-[74px] z-30 bg-brand-bg/95 backdrop-blur-md py-4 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 transition-all duration-300 mb-10"
+        >
+          <div
+            ref={categoryTabContainerRef}
+            className="flex overflow-x-auto pb-1 gap-2 scrollbar-thin scrollbar-thumb-brand-accent/60 scrollbar-track-transparent max-w-7xl mx-auto"
+          >
             {categories.map((category) => (
               <button
                 key={category}
-                onClick={() => setSelectedCategory(category)}
+                data-category={category}
+                onClick={() => handleCategoryClick(category)}
                 className={`px-6 py-3 rounded-full text-xs font-bold tracking-wide uppercase whitespace-nowrap transition-all duration-300 shadow-sm border ${
                   selectedCategory === category
                     ? "bg-brand-dark text-brand-bg border-brand-dark"
@@ -167,22 +305,44 @@ export default function Menu() {
           </div>
         </div>
 
-        {/* Dish Grid Layout */}
-        <AnimatePresence mode="wait">
-          {filteredDishes.length > 0 ? (
-            <motion.div
-              key={`${selectedCategory}-${searchQuery}-${sortBy}-${showChefSpecialsOnly}-${showHighRatingOnly}`}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.4 }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {filteredDishes.map((dish) => (
-                <DishCard key={dish.id} dish={dish} />
-              ))}
-            </motion.div>
-          ) : (
+        {/* Dish Categories Unified List Layout */}
+        <div className="space-y-16">
+          {categories.filter(c => c !== "All").map((category) => {
+            const dishes = groupedDishes[category] || [];
+            if (dishes.length === 0) return null; // Hide categories with no matches
+
+            const elementId = `category-section-${category.replace(/\s+/g, '-').replace(/'/g, '')}`;
+
+            return (
+              <div key={category} id={elementId} className="scroll-mt-[205px]">
+                {/* Category Heading */}
+                <div className="border-b border-brand-gold/25 pb-3 mb-8 flex justify-between items-end">
+                  <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-brand-dark tracking-tight">
+                    {category}
+                  </h2>
+                  <span className="text-xs font-bold text-brand-gold bg-brand-gold/15 border border-brand-gold/20 px-3 py-1 rounded-full uppercase tracking-wider">
+                    {dishes.length} {dishes.length === 1 ? "Dish" : "Dishes"}
+                  </span>
+                </div>
+
+                {/* Dish Grid Layout */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {dishes.map((dish) => (
+                    <div 
+                      key={dish.id} 
+                      id={`dish-item-${dish.id}`} 
+                      className="scroll-mt-[225px] rounded-2xl transition-all duration-300"
+                    >
+                      <DishCard dish={dish} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Fallback for when absolutely no dishes are found in any category */}
+          {allFilteredDishes.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -190,12 +350,11 @@ export default function Menu() {
             >
               <h3 className="font-display font-extrabold text-xl text-brand-dark mb-2">No Culinary Matches Found</h3>
               <p className="text-xs text-brand-dark/65 max-w-sm mx-auto">
-                We couldn't find any dishes fitting your search parameters. Try choosing another category or clearing filters.
+                We couldn't find any dishes fitting your search parameters. Try clearing your filters.
               </p>
               <button
                 onClick={() => {
                   setSearchQuery("");
-                  setSelectedCategory("All");
                   setSortBy("none");
                   setShowChefSpecialsOnly(false);
                   setShowHighRatingOnly(false);
@@ -206,7 +365,7 @@ export default function Menu() {
               </button>
             </motion.div>
           )}
-        </AnimatePresence>
+        </div>
       </div>
     </div>
   );

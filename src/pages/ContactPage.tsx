@@ -13,15 +13,15 @@ interface Branch {
 
 const branches: Branch[] = [
   {
-    id: "chinthal",
-    name: "Sri Krishna Dhaba - Chinthal",
+    id: "pragathinagar",
+    name: "Sri Krishna Dhaba - Pragathi Nagar",
     address:
-      "2nd floor, HMT Rd, above The Kakatiya Co-operative Bank.LTD, beside Ridge Towers, Chinthal, Quthbullapur, Hyderabad, Telangana 500037",
+      "A/1, Oop Godavari Cuts, Bajrang Towers, 6-109/1760, Pragathi Nagar Rd, 3rd layout, Pragathi Nagar, Nizampet, Hyderabad, Telangana 500090",
     phone: "+91 90322 92421",
     hours: "Mon – Sun: 11:30 AM – 11:45 PM",
     mapSrc:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3805.301124844372!2d78.4485542!3d17.4931326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb910db054e0ad%3A0x6e289d0b6a6c23b2!2sSRI%20KRISHNA%20FAMILY%20DHABA!5e0!3m2!1sen!2sin!4v1704481029192!5m2!1sen!2sin",
-    googleMapsUrl: "https://maps.google.com/?q=SRI+KRISHNA+FAMILY+DHABA+Chinthal+Hyderabad"
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3805.378779646875!2d78.3924395!3d17.5254461!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb8f0052362da1%3A0xd093fe41bf080e4d!2sSri%20Krishna%20Family%20Dhaba!5e0!3m2!1sen!2sin!4v1704481029192!5m2!1sen!2sin",
+    googleMapsUrl: "https://www.google.com/maps/place/Sri+Krishna+Family+Dhaba/@17.5254461,78.3950244,17z/data=!3m1!4b1!4m6!3m5!1s0x3bcb8f0052362da1:0xd093fe41bf080e4d!8m2!3d17.5254461!4d78.3950244!16s%2Fg%2F11wvt0qq4l"
   },
   {
     id: "aziznagar",
@@ -37,7 +37,7 @@ const branches: Branch[] = [
 ];
 
 export default function ContactPage() {
-  const [activeBranch, setActiveBranch] = useState<string>("chinthal");
+  const [activeBranch, setActiveBranch] = useState<string>("pragathinagar");
 
   const currentBranch = branches.find((b) => b.id === activeBranch)!;
 
@@ -156,7 +156,7 @@ export default function ContactPage() {
             <div className="space-y-4 pt-2">
               {/* Zomato */}
               <a
-                href="https://zomato.com"
+                href="https://www.zomato.com/hyderabad/search?q=Sri%20Krishna%20Family%20Dhaba"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between bg-white rounded-2xl p-5 shadow-sm border-l-4 border-red-500 hover:shadow-md transition-shadow group"
@@ -175,7 +175,7 @@ export default function ContactPage() {
 
               {/* Swiggy */}
               <a
-                href="https://swiggy.com"
+                href="https://www.swiggy.com/search?query=Sri%20Krishna%20Family%20Dhaba"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between bg-white rounded-2xl p-5 shadow-sm border-l-4 border-orange-500 hover:shadow-md transition-shadow group"
@@ -219,7 +219,7 @@ export default function ContactPage() {
                     : "bg-white text-brand-dark border-brand-gold/15 hover:border-brand-accent/40"
                 }`}
               >
-                {branch.id === "chinthal" ? "Chinthal" : "Aziz Nagar"}
+                {branch.id === "pragathinagar" ? "Pragathi Nagar" : "Aziz Nagar"}
               </button>
             ))}
           </div>
@@ -294,12 +294,18 @@ export default function ContactPage() {
             </div>
 
             {/* Right: Google Maps Embed */}
-            <div className="h-[350px] lg:h-auto min-h-[350px] rounded-3xl overflow-hidden border border-brand-gold/10 shadow-sm bg-white">
+            <div className="h-[350px] lg:h-auto min-h-[350px] rounded-3xl overflow-hidden border border-brand-gold/10 shadow-sm bg-white relative">
               <iframe
                 key={currentBranch.id}
                 title={`${currentBranch.name} Map`}
                 src={currentBranch.mapSrc}
-                className="w-full h-full border-0"
+                className="border-0 absolute"
+                style={{
+                  width: 'calc(100% + 20px)',
+                  height: 'calc(100% + 80px)',
+                  top: '-75px',
+                  left: '-10px'
+                }}
                 allowFullScreen={false}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"

@@ -39,7 +39,7 @@ const initialReviews: Review[] = [
     name: "Sai Kumar",
     role: "2 reviews • 9 photos",
     rating: 4,
-    quote: "Ordered Paneer Biryani and Tandoori Roti. The quantity was massive and the taste was authentic. Great experience in Chinthal.",
+    quote: "Ordered Paneer Biryani and Tandoori Roti. The quantity was massive and the taste was authentic. Great experience in Pragathi Nagar.",
     date: "4 months ago",
     source: "Google Reviews",
     avatar: "SK"

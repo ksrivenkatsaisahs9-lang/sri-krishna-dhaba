@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Star, X, Check, Heart, ShieldAlert, Sparkles } from "lucide-react";
+import { Star, X, Check, Heart, ShieldAlert, Sparkles, ShoppingBag, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { formatPrice, getNumericPrice } from "../utils/menuHelpers";
 
 export interface Dish {
   id: string;
@@ -8,7 +9,7 @@ export interface Dish {
   teluguTitle: string;
   category: string;
   description: string;
-  price: number;
+  price: number | string;
   rating: number;
   image: string;
   isPopular?: boolean;
@@ -20,101 +21,182 @@ export interface Dish {
 
 interface DishCardProps {
   dish: Dish;
+  onClickOverride?: (e: React.MouseEvent) => void;
+  showImage?: boolean;
 }
 
-export default function DishCard({ dish }: DishCardProps) {
+export default function DishCard({ dish, onClickOverride, showImage = false }: DishCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [ordered, setOrdered] = useState(false);
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   const handleOrder = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setOrdered(true);
-    setTimeout(() => setOrdered(false), 2000);
+    if (onClickOverride) {
+      onClickOverride(e);
+      return;
+    }
+    setIsOrderModalOpen(true);
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (onClickOverride) {
+      onClickOverride(e);
+      return;
+    }
+    setIsOpen(true);
   };
 
   return (
     <>
       <motion.div
         layoutId={`card-container-${dish.id}`}
-        onClick={() => setIsOpen(true)}
-        className="glass-panel rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 border border-brand-gold/15 group relative flex flex-col h-full"
-        whileHover={{ y: -6 }}
+        onClick={handleCardClick}
+        className={`bg-brand-bg rounded-2xl border border-brand-dark/20 hover:border-brand-accent/50 transition-all duration-300 cursor-pointer group relative h-full flex ${
+          showImage ? "flex-col overflow-hidden hover:shadow-lg min-h-[380px]" : "p-5 justify-between items-center gap-4 hover:shadow-md min-h-[120px]"
+        }`}
+        whileHover={{ y: showImage ? -5 : -3 }}
       >
-        {/* Popular / Chef Special Badges */}
-        <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
-          {dish.isChefSpecial && (
-            <span className="bg-brand-accent text-brand-bg text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-md shadow flex items-center gap-1">
-              <Sparkles size={10} className="fill-brand-bg" />
-              <span>Chef's Choice</span>
-            </span>
-          )}
-          {dish.isPopular && (
-            <span className="bg-brand-gold text-brand-dark text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-md shadow">
-              Popular
-            </span>
-          )}
-        </div>
+        {showImage ? (
+          <>
+            {/* Top: Image Section */}
+            <div className="relative w-full aspect-[4/3] overflow-hidden bg-brand-dark/5 shrink-0">
+              <img 
+                src={dish.image} 
+                alt={dish.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              {/* Wishlist Button floated on Image */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsLiked(!isLiked);
+                }}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white flex items-center justify-center text-brand-accent shadow-sm transition-all duration-300"
+              >
+                <Heart size={15} className={isLiked ? "fill-brand-accent text-brand-accent" : ""} />
+              </button>
 
-        {/* Wishlist Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsLiked(!isLiked);
-          }}
-          className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-brand-bg/80 backdrop-blur-md flex items-center justify-center text-brand-accent hover:bg-brand-accent hover:text-brand-bg transition-all duration-300 shadow"
-        >
-          <Heart size={15} className={isLiked ? "fill-brand-accent text-brand-accent" : ""} />
-        </button>
+              {/* Badges on Image */}
+              <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
+                <span className="border border-emerald-500/30 bg-emerald-500/90 text-white text-[9px] font-bold tracking-wider px-2 py-0.5 rounded shadow-sm uppercase shrink-0">
+                  VEG
+                </span>
+                {dish.isChefSpecial && (
+                  <span className="bg-brand-accent/90 border border-brand-accent/25 text-brand-bg text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded flex items-center gap-1 shadow-sm shrink-0">
+                    <Sparkles size={8} className="fill-brand-bg animate-pulse" />
+                    <span>Chef's Choice</span>
+                  </span>
+                )}
+                {dish.isPopular && (
+                  <span className="bg-brand-gold/90 border border-brand-gold/25 text-brand-dark text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded shadow-sm shrink-0">
+                    Popular
+                  </span>
+                )}
+              </div>
+            </div>
 
-        {/* Card Image */}
-        <div className="relative aspect-video w-full overflow-hidden bg-brand-dark/10">
-          <img
-            src={dish.image}
-            alt={dish.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </div>
+            {/* Bottom: Info Section */}
+            <div className="p-5 flex flex-col flex-grow justify-between min-h-[170px]">
+              <div>
+                {/* Title and Telugu Title */}
+                <h3 className="font-display font-bold text-lg text-brand-dark group-hover:text-brand-accent transition-colors duration-300 truncate">
+                  {dish.title}
+                </h3>
+                <p className="font-telugu text-[12px] text-brand-gold font-semibold mt-0.5 truncate">
+                  {dish.teluguTitle}
+                </p>
 
-        {/* Card Body */}
-        <div className="p-5 flex flex-col flex-grow">
-          {/* Header */}
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <h3 className="font-display font-bold text-lg text-brand-dark group-hover:text-brand-accent transition-colors duration-300">
+                {/* Short Description */}
+                {dish.description && (
+                  <p className="text-xs text-brand-dark/70 leading-relaxed mt-2 line-clamp-2">
+                    {dish.description}
+                  </p>
+                )}
+              </div>
+
+              {/* Price & Quick Add Row */}
+              <div className="flex items-center justify-between mt-4 pt-3 border-t border-brand-dark/10">
+                <span className="font-display font-extrabold text-brand-dark text-lg">
+                  {formatPrice(dish.price)}
+                </span>
+
+                <button
+                  onClick={handleOrder}
+                  className="bg-brand-accent hover:bg-brand-dark text-brand-bg text-xs font-bold px-5 py-2 rounded-full shadow-md transition-all duration-300"
+                >
+                  {ordered ? "Added!" : "Order Now"}
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Left Side: Info */}
+            <div className="flex flex-col flex-grow min-w-0 pr-2">
+              {/* Badge Row */}
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <span className="border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 text-[9px] font-bold tracking-wider px-2 py-0.5 rounded uppercase shrink-0">
+                  VEG
+                </span>
+                {dish.isChefSpecial && (
+                  <span className="bg-brand-accent/10 border border-brand-accent/25 text-brand-accent text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded flex items-center gap-1 shrink-0">
+                    <Sparkles size={8} className="fill-brand-accent animate-pulse" />
+                    <span>Chef's Choice</span>
+                  </span>
+                )}
+                {dish.isPopular && (
+                  <span className="bg-brand-gold/10 border border-brand-gold/25 text-brand-dark text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded shrink-0">
+                    Popular
+                  </span>
+                )}
+              </div>
+
+              {/* Title and Telugu Title */}
+              <h3 className="font-display font-bold text-base sm:text-lg text-brand-dark group-hover:text-brand-accent transition-colors duration-300 truncate">
                 {dish.title}
               </h3>
-              <p className="font-telugu text-xs text-brand-gold font-medium mt-0.5">
+              <p className="font-telugu text-[11px] text-brand-gold font-semibold mt-0.5 truncate">
                 {dish.teluguTitle}
               </p>
-            </div>
-            <div className="flex items-center space-x-1 bg-brand-bg px-2 py-0.5 rounded border border-brand-gold/10 text-xs text-brand-dark shrink-0">
-              <Star size={12} className="fill-brand-gold text-brand-gold" />
-              <span className="font-bold">{dish.rating}</span>
-            </div>
-          </div>
 
-          {/* Description */}
-          <p className="text-xs text-brand-dark/70 leading-relaxed mb-4 flex-grow">
-            {dish.description}
-          </p>
-
-          {/* Footer / CTA */}
-          <div className="flex items-center justify-between pt-4 border-t border-brand-dark/5 mt-auto">
-            <div>
-              <span className="text-[10px] uppercase tracking-wider text-brand-dark/50 block">Price</span>
-              <span className="font-display font-extrabold text-brand-dark text-base">₹{dish.price}</span>
+              {/* Short Description */}
+              {dish.description && (
+                <p className="text-xs text-brand-dark/65 leading-relaxed mt-2 line-clamp-1 max-w-sm hidden sm:block">
+                  {dish.description}
+                </p>
+              )}
             </div>
 
-            <button
-              onClick={handleOrder}
-              className="bg-brand-accent/90 hover:bg-brand-accent text-brand-bg text-xs font-bold px-4 py-2 rounded-full shadow transition-all duration-300 border border-transparent"
-            >
-              {ordered ? "Added!" : "Quick Add"}
-            </button>
-          </div>
-        </div>
+            {/* Right Side: Price & Quick Add */}
+            <div className="flex flex-col items-end justify-between self-stretch shrink-0 min-w-[120px]">
+              {/* Wishlist Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsLiked(!isLiked);
+                }}
+                className="w-7 h-7 rounded-full bg-brand-dark/5 hover:bg-brand-accent/15 flex items-center justify-center text-brand-accent transition-all duration-300 mb-2 self-end"
+              >
+                <Heart size={14} className={isLiked ? "fill-brand-accent text-brand-accent" : ""} />
+              </button>
+
+              {/* Price */}
+              <span className="font-display font-extrabold text-brand-dark text-base sm:text-lg">
+                {formatPrice(dish.price)}
+              </span>
+
+              {/* Quick Add Button */}
+              <button
+                onClick={handleOrder}
+                className="mt-2 bg-brand-accent/90 hover:bg-brand-accent text-brand-bg text-[11px] font-bold px-4 py-1.5 rounded-full shadow-sm transition-all duration-300 border border-transparent shrink-0"
+              >
+                {ordered ? "Added!" : "Order Now"}
+              </button>
+            </div>
+          </>
+        )}
       </motion.div>
 
       {/* Detail Modal Overlay */}
@@ -133,57 +215,59 @@ export default function DishCard({ dish }: DishCardProps) {
             {/* Modal Box */}
             <motion.div
               layoutId={`card-container-${dish.id}`}
-              className="relative w-full max-w-2xl bg-brand-bg rounded-3xl overflow-hidden shadow-2xl border border-brand-gold/20 z-10 flex flex-col md:flex-row max-h-[90vh]"
+              className="relative w-full max-w-md bg-brand-bg rounded-3xl p-6 sm:p-8 shadow-2xl border border-brand-gold/20 z-10 flex flex-col max-h-[90vh]"
             >
-              {/* Left Side: Large Image */}
-              <div className="w-full md:w-1/2 relative min-h-[220px] md:min-h-full">
-                <img
-                  src={dish.image}
-                  alt={dish.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/50 via-transparent to-brand-dark/20" />
-                <div className="absolute bottom-4 left-4 text-white">
-                  <span className="bg-brand-gold/90 text-brand-dark text-[9px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full backdrop-blur-sm">
+              {/* Close Button */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-brand-dark/10 hover:bg-brand-accent hover:text-brand-bg flex items-center justify-center text-brand-dark transition-all duration-300 z-20"
+              >
+                <X size={18} />
+              </button>
+
+              {/* Title & Badge */}
+              <div className="mt-4 mb-4">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <span className="border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 text-[9px] font-bold tracking-wider px-2.5 py-0.5 rounded uppercase">
+                    VEG
+                  </span>
+                  <span className="bg-brand-gold/90 text-brand-dark text-[9px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded">
                     {dish.category}
                   </span>
-                  <h2 className="font-display font-extrabold text-2xl mt-2 leading-tight drop-shadow-md">
-                    {dish.title}
-                  </h2>
-                  <p className="font-telugu text-sm text-brand-gold font-semibold mt-1 drop-shadow-sm">
-                    {dish.teluguTitle}
-                  </p>
                 </div>
+                <h2 className="font-display font-extrabold text-2xl text-brand-dark leading-tight">
+                  {dish.title}
+                </h2>
+                <p className="font-telugu text-sm text-brand-gold font-semibold mt-1">
+                  {dish.teluguTitle}
+                </p>
               </div>
 
-              {/* Right Side: Info & Actions */}
-              <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto max-h-[50vh] md:max-h-[85vh]">
-                {/* Close Button */}
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="absolute top-4 right-4 w-9 h-9 rounded-full bg-brand-dark/10 hover:bg-brand-accent hover:text-brand-bg flex items-center justify-center text-brand-dark transition-all duration-300 z-20"
-                >
-                  <X size={18} />
-                </button>
-
+              {/* Scrollable Content */}
+              <div className="overflow-y-auto pr-1 mb-6 space-y-4">
+                {showImage && dish.image && (
+                  <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden mb-4 bg-brand-dark/5 shadow-sm">
+                    <img src={dish.image} alt={dish.title} className="w-full h-full object-cover" />
+                  </div>
+                )}
                 {/* Rating & Prep Time */}
-                <div className="flex items-center gap-4 mb-4 text-xs font-semibold text-brand-dark/75">
+                <div className="flex items-center gap-4 text-xs font-semibold text-brand-dark/75">
                   <div className="flex items-center space-x-1 text-brand-gold">
                     <Star size={14} className="fill-brand-gold" />
                     <span className="font-bold text-brand-dark">{dish.rating} / 5.0</span>
                   </div>
                   {dish.prepTime && <span>• Prep: {dish.prepTime}</span>}
-                  <span>• Vegetarian</span>
+                  <span>• Pure Vegetarian</span>
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-brand-dark/80 leading-relaxed mb-6 font-sans">
+                <p className="text-sm text-brand-dark/80 leading-relaxed font-sans">
                   {dish.description}
                 </p>
 
                 {/* Ingredients */}
                 {dish.ingredients && dish.ingredients.length > 0 && (
-                  <div className="mb-5">
+                  <div>
                     <h4 className="text-xs uppercase tracking-wider text-brand-accent font-bold mb-2">Ingredients</h4>
                     <div className="flex flex-wrap gap-1.5">
                       {dish.ingredients.map((ing) => (
@@ -197,7 +281,7 @@ export default function DishCard({ dish }: DishCardProps) {
 
                 {/* Allergens warning */}
                 {dish.allergens && dish.allergens.length > 0 && (
-                  <div className="mb-6 bg-brand-accent/5 border border-brand-accent/15 p-3 rounded-xl flex gap-2 items-start">
+                  <div className="bg-brand-accent/5 border border-brand-accent/15 p-3 rounded-xl flex gap-2 items-start">
                     <ShieldAlert size={16} className="text-brand-accent shrink-0 mt-0.5" />
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-brand-accent block">Allergen Info</span>
@@ -205,31 +289,136 @@ export default function DishCard({ dish }: DishCardProps) {
                     </div>
                   </div>
                 )}
+              </div>
 
-                {/* CTA Action */}
-                <div className="mt-auto pt-6 border-t border-brand-dark/15 flex items-center justify-between gap-4">
-                  <div>
-                    <span className="text-xs text-brand-dark/50 block">Special Price</span>
-                    <span className="font-display font-extrabold text-2xl text-brand-dark">₹{dish.price}</span>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setOrdered(true);
-                      setTimeout(() => setOrdered(false), 2000);
-                    }}
-                    className="flex-1 bg-brand-accent hover:bg-brand-dark text-brand-bg font-bold text-sm tracking-wide py-3 px-6 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center space-x-2"
-                  >
-                    {ordered ? (
-                      <>
-                        <Check size={16} />
-                        <span>Added to Cart</span>
-                      </>
-                    ) : (
-                      <span>Add to Order</span>
-                    )}
-                  </button>
+              {/* Action Area */}
+              <div className="pt-4 border-t border-brand-dark/15 flex items-center justify-between gap-4 mt-auto">
+                <div>
+                  <span className="text-xs text-brand-dark/50 block">Price</span>
+                  <span className="font-display font-extrabold text-xl sm:text-2xl text-brand-dark">{formatPrice(dish.price)}</span>
                 </div>
+
+                <button
+                  onClick={(e) => {
+                    setIsOpen(false);
+                    handleOrder(e);
+                  }}
+                  className="flex-1 bg-brand-accent hover:bg-brand-dark text-brand-bg font-bold text-sm tracking-wide py-3 px-6 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center space-x-2"
+                >
+                  <span>Order Now</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Order Platform Modal Overlay */}
+      <AnimatePresence>
+        {isOrderModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOrderModalOpen(false)}
+              className="absolute inset-0 bg-brand-dark/60 backdrop-blur-md"
+            />
+
+            {/* Modal Box */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md bg-[#FAF6F0] rounded-[2.5rem] overflow-hidden shadow-2xl border border-brand-gold/20 z-10 flex flex-col"
+            >
+              {/* Header: Dark Brown branding header */}
+              <div className="bg-[#2B1B12] text-white p-8 flex flex-col items-center text-center space-y-3 relative">
+                {/* Close Button */}
+                <button
+                  onClick={() => setIsOrderModalOpen(false)}
+                  className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors duration-300"
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
+
+                {/* Gold Seal Shopping Bag icon */}
+                <div className="w-12 h-12 rounded-2xl bg-white/5 border border-brand-gold/15 flex items-center justify-center text-brand-gold">
+                  <ShoppingBag size={20} />
+                </div>
+
+                <h3 className="font-display font-black text-2xl tracking-wide uppercase">
+                  Order Online
+                </h3>
+                <p className="text-xs text-brand-bg/75">
+                  Choose your platform to order <span className="text-brand-gold font-bold">{dish.title}</span>
+                </p>
+              </div>
+
+              {/* Body Platform Selection */}
+              <div className="p-6 space-y-5">
+                {/* Swiggy & Zomato row */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Swiggy */}
+                  <a
+                    href={`https://www.swiggy.com/search?query=${encodeURIComponent(`Sri Krishna Family Dhaba ${dish.title}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#fc8019] text-white rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-md group/platform"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-white text-[#fc8019] flex items-center justify-center text-lg font-black font-display mb-3 select-none shadow-sm">
+                      S
+                    </div>
+                    <span className="text-xs font-bold font-sans">Swiggy</span>
+                    <span className="text-[9px] opacity-80 mt-0.5">Fast delivery - Live tracking</span>
+                    <span className="text-[10px] font-bold mt-3 border-b border-white/40 pb-0.5 group-hover/platform:border-white transition-colors">
+                      Order Now →
+                    </span>
+                  </a>
+
+                  {/* Zomato */}
+                  <a
+                    href={`https://www.zomato.com/hyderabad/search?q=${encodeURIComponent(`Sri Krishna Family Dhaba ${dish.title}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#cb202d] text-white rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-md group/platform"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-white text-[#cb202d] flex items-center justify-center text-lg font-black font-display mb-3 select-none shadow-sm">
+                      Z
+                    </div>
+                    <span className="text-xs font-bold font-sans">Zomato</span>
+                    <span className="text-[9px] opacity-80 mt-0.5">Reviews - Ratings - Delivery</span>
+                    <span className="text-[10px] font-bold mt-3 border-b border-white/40 pb-0.5 group-hover/platform:border-white transition-colors">
+                      Order Now →
+                    </span>
+                  </a>
+                </div>
+
+                {/* WhatsApp */}
+                <a
+                  href={`https://wa.me/919032292421?text=${encodeURIComponent(`Hello Sri Krishna Family Dhaba, I would like to order "${dish.title}" from the menu.`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#25d366] text-white rounded-2xl p-4 flex items-center justify-between hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 shadow-md"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-white text-[#25d366] flex items-center justify-center shadow-sm">
+                      <MessageCircle size={16} className="fill-[#25d366]/10" />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="text-xs font-bold font-sans">WhatsApp</h4>
+                      <p className="text-[9px] opacity-80 mt-0.5">Call or chat to place order directly</p>
+                    </div>
+                  </div>
+                  <span className="text-white text-xs font-bold">→</span>
+                </a>
+              </div>
+
+              {/* Footer */}
+              <div className="pb-6 px-4 text-[9px] text-brand-dark/50 text-center uppercase tracking-wider font-semibold font-sans">
+                Sri Krishna Family Dhaba • Pragathi Nagar • +91 90322 92421
               </div>
             </motion.div>
           </div>

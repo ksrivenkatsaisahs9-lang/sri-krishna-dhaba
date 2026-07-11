@@ -127,53 +127,92 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile Menu Overlay (Full Screen) */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-x-0 top-[60px] z-40 lg:hidden glass-panel shadow-2xl border-b border-brand-gold/25"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-50 lg:hidden bg-brand-bg/98 backdrop-blur-lg flex flex-col justify-between py-6 px-6"
           >
-            <div className="px-4 pt-3 pb-6 space-y-2.5">
-              {navLinks.map((link) => {
+            {/* Header Row in Overlay */}
+            <div className="flex items-center justify-between pb-6 border-b border-brand-dark/10">
+              <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-full bg-brand-dark border-2 border-brand-gold flex items-center justify-center shadow-md">
+                  <svg className="w-8 h-8 text-brand-gold fill-brand-gold" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#D4AF37" strokeWidth="2" strokeDasharray="3 3" />
+                    <path d="M50 20 L55 33 L69 33 L58 41 L62 55 L50 47 L38 55 L42 41 L31 33 L45 33 Z" />
+                    <text x="50" y="70" textAnchor="middle" fontSize="12" fontWeight="black" fill="#D4AF37" fontFamily="monospace" letterSpacing="1">SKD</text>
+                    <text x="50" y="80" textAnchor="middle" fontSize="6" fontWeight="bold" fill="#D4AF37" fontFamily="sans-serif">ESTD 1998</text>
+                  </svg>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-display font-black text-sm tracking-wider text-brand-dark uppercase">
+                    SRI KRISHNA DHABA
+                  </span>
+                  <span className="font-telugu text-[9px] text-brand-accent font-semibold tracking-wider -mt-0.5">
+                    శ్రీ కృష్ణ ఫ్యామిలీ ధాబ
+                  </span>
+                </div>
+              </Link>
+
+              {/* Close Icon button */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-10 h-10 rounded-full bg-brand-dark/5 hover:bg-brand-accent hover:text-brand-bg flex items-center justify-center text-brand-dark transition-colors duration-300 focus:outline-none"
+                aria-label="Close Menu"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Links Stack in Center */}
+            <div className="flex-grow flex flex-col justify-center py-8 space-y-4">
+              {navLinks.map((link, index) => {
                 const isActive = location.pathname === link.path;
                 return (
-                  <Link
+                  <motion.div
                     key={link.path}
-                    to={link.path}
-                    onClick={() => setIsOpen(false)}
-                    className={`block px-4 py-2.5 rounded-xl text-xs font-bold tracking-widest uppercase transition-all duration-300 ${
-                      isActive
-                        ? "bg-brand-gold text-brand-dark shadow-md"
-                        : "text-brand-dark hover:bg-brand-accent/10 hover:text-brand-accent"
-                    }`}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
                   >
-                    <span>{link.name}</span>
-                  </Link>
+                    <Link
+                      to={link.path}
+                      onClick={() => setIsOpen(false)}
+                      className={`block py-3 px-4 rounded-2xl text-lg font-black tracking-widest uppercase transition-all duration-300 text-center ${
+                        isActive
+                          ? "bg-brand-gold text-brand-dark shadow-md"
+                          : "text-brand-dark hover:bg-brand-accent/5 hover:text-brand-accent"
+                      }`}
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.div>
                 );
               })}
-              
-              <div className="pt-4 border-t border-brand-dark/10 px-2 flex flex-col gap-3">
-                <a
-                  href="tel:+919032292421"
-                  onClick={() => setIsOpen(false)}
-                  className="w-full flex items-center justify-center gap-1.5 border border-brand-dark text-brand-dark hover:bg-brand-dark hover:text-brand-bg text-[10px] font-bold tracking-widest uppercase py-3 rounded-full transition-all duration-300"
-                >
-                  <Phone size={14} />
-                  <span>Call Now</span>
-                </a>
-                <Link
-                  to="/menu"
-                  onClick={() => setIsOpen(false)}
-                  className="w-full flex items-center justify-center gap-1.5 bg-brand-gold text-brand-dark text-[10px] font-bold tracking-widest uppercase py-3 rounded-full transition-all duration-300 shadow-md"
-                >
-                  <ShoppingBag size={14} />
-                  <span>Order Online</span>
-                </Link>
-              </div>
+            </div>
+
+            {/* Bottom Row inside overlay */}
+            <div className="pt-6 border-t border-brand-dark/10 flex flex-col gap-3.5">
+              <a
+                href="tel:+919032292421"
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center justify-center gap-2 border border-brand-dark text-brand-dark hover:bg-brand-dark hover:text-brand-bg text-xs font-bold tracking-widest uppercase py-4 rounded-full transition-all duration-300"
+              >
+                <Phone size={15} />
+                <span>Call Now</span>
+              </a>
+              <Link
+                to="/menu"
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center justify-center gap-2 bg-brand-gold text-brand-dark text-xs font-bold tracking-widest uppercase py-4 rounded-full transition-all duration-300 shadow-md"
+              >
+                <ShoppingBag size={15} />
+                <span>Order Online</span>
+              </Link>
             </div>
           </motion.div>
         )}
