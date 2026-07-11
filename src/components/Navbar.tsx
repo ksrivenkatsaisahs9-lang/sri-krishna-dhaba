@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Phone, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { db } from "../utils/db";
 
 const navLinks = [
   { name: "HOME", path: "/" },
@@ -15,7 +16,16 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [phone, setPhone] = useState("+91 90322 92421");
   const location = useLocation();
+
+  useEffect(() => {
+    db.init();
+    const settings = db.getSettings();
+    if (settings && settings.contactPhone) {
+      setPhone(settings.contactPhone);
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,6 +34,8 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const cleanPhone = phone.replace(/[^0-9+]/g, "");
 
   return (
     <>
@@ -89,7 +101,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center space-x-3 shrink-0">
               {/* Call Now Outline Button */}
               <a
-                href="tel:+919032292421"
+                href={`tel:${cleanPhone}`}
                 className="flex items-center gap-1.5 border border-brand-dark/40 hover:border-brand-dark text-brand-dark hover:bg-brand-dark hover:text-brand-bg text-[10px] xl:text-xs font-bold tracking-widest uppercase px-4 py-2.5 rounded-full transition-all duration-300 shadow-sm"
               >
                 <Phone size={13} />
@@ -117,7 +129,7 @@ export default function Navbar() {
             {/* Mobile menu button */}
             <div className="lg:hidden flex items-center space-x-4">
               <a
-                href="tel:+919032292421"
+                href={`tel:${cleanPhone}`}
                 className="md:hidden flex items-center justify-center w-8 h-8 rounded-full bg-brand-accent/10 text-brand-accent hover:bg-brand-accent hover:text-brand-bg transition-colors"
                 aria-label="Call Now"
               >
@@ -206,7 +218,7 @@ export default function Navbar() {
             {/* Bottom Row inside overlay */}
             <div className="pt-6 border-t border-brand-dark/10 flex flex-col gap-3">
               <a
-                href="tel:+919032292421"
+                href={`tel:${cleanPhone}`}
                 onClick={() => setIsOpen(false)}
                 className="w-full flex items-center justify-center gap-2 border border-brand-dark text-brand-dark hover:bg-brand-dark hover:text-brand-bg text-xs font-bold tracking-widest uppercase py-3.5 rounded-full transition-all duration-300"
               >

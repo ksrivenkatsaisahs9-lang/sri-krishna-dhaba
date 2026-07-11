@@ -1,7 +1,21 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Clock, MapPin, Phone, MessageCircle } from "lucide-react";
+import { db } from "../utils/db";
 
 export default function Footer() {
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    db.init();
+    setSettings(db.getSettings());
+  }, []);
+
+  const phone = settings?.contactPhone || "+91 90322 92421";
+  const cleanPhone = phone.replace(/[^0-9+]/g, "");
+  const whatsappNum = settings?.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, "") : "919032292421";
+  const address = settings?.contactAddress || "A/1, Oop Godavari Cuts, Bajrang Towers, 6-109/1760, Pragathi Nagar Rd, Hyderabad, Telangana 500090";
+  const timings = settings?.timings || "Mon – Sun: 11:30 AM – 11:45 PM";
   return (
     <footer className="bg-brand-dark text-brand-bg/85 pt-16 pb-8 border-t border-brand-gold/15 relative overflow-hidden">
       {/* Decorative Background Elements */}
@@ -41,7 +55,7 @@ export default function Footer() {
             <div className="flex items-center space-x-3 pt-2">
               {/* Phone (Blue) */}
               <a
-                href="tel:+919032292421"
+                href={`tel:${cleanPhone}`}
                 className="w-10 h-10 rounded-full bg-[#007aff] hover:bg-[#007aff]/90 text-white flex items-center justify-center transition-transform hover:scale-105"
                 aria-label="Call Us"
               >
@@ -50,7 +64,7 @@ export default function Footer() {
 
               {/* WhatsApp (Green) */}
               <a
-                href="https://wa.me/919032292421"
+                href={`https://wa.me/${whatsappNum}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-[#25d366] hover:bg-[#25d366]/90 text-white flex items-center justify-center transition-transform hover:scale-105"
@@ -123,7 +137,7 @@ export default function Footer() {
                 <Clock size={18} className="text-brand-gold shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-white">Daily Service</p>
-                  <p className="text-brand-bg/70 mt-1">11:30 AM – 11:45 PM</p>
+                  <p className="text-brand-bg/70 mt-1">{timings}</p>
                 </div>
               </div>
               <div className="text-xs text-brand-accent bg-brand-accent/10 border border-brand-accent/20 px-3 py-2 rounded-lg">
@@ -147,7 +161,7 @@ export default function Footer() {
                 <MapPin size={16} className="text-brand-gold shrink-0 mt-0.5 group-hover/branch:scale-110 transition-transform" />
                 <div>
                   <p className="font-bold text-white group-hover/branch:text-brand-gold">Pragathi Nagar Branch</p>
-                  <p className="text-brand-bg/65 text-[11px] leading-tight mt-0.5">A/1, Bajrang Towers, Pragathi Nagar, Nizampet, Hyderabad</p>
+                  <p className="text-brand-bg/65 text-[11px] leading-tight mt-0.5">{address}</p>
                 </div>
               </a>
               <a
@@ -164,8 +178,8 @@ export default function Footer() {
               </a>
               <div className="flex items-center space-x-2 pt-1">
                 <Phone size={16} className="text-brand-gold shrink-0" />
-                <a href="tel:+919032292421" className="text-white hover:text-brand-accent font-semibold transition-colors duration-300">
-                  +91 90322 92421
+                <a href={`tel:${cleanPhone}`} className="text-white hover:text-brand-accent font-semibold transition-colors duration-300">
+                  {phone}
                 </a>
               </div>
             </div>

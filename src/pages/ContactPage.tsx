@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Phone, Mail, MessageCircle, ArrowRight, MapPin, Clock } from "lucide-react";
+import { db } from "../utils/db";
 
 interface Branch {
   id: string;
@@ -38,8 +39,33 @@ const branches: Branch[] = [
 
 export default function ContactPage() {
   const [activeBranch, setActiveBranch] = useState<string>("pragathinagar");
+  const [settings, setSettings] = useState<any>(null);
 
-  const currentBranch = branches.find((b) => b.id === activeBranch)!;
+  useEffect(() => {
+    db.init();
+    setSettings(db.getSettings());
+  }, []);
+
+  const dynamicBranches = useMemo(() => {
+    if (!settings) return branches;
+    return branches.map(b => {
+      if (b.id === "pragathinagar") {
+        return {
+          ...b,
+          address: settings.contactAddress || b.address,
+          phone: settings.contactPhone || b.phone,
+          hours: settings.timings || b.hours
+        };
+      }
+      return b;
+    });
+  }, [settings]);
+
+  const currentBranch = dynamicBranches.find((b) => b.id === activeBranch)!;
+  const mainPhone = settings?.contactPhone || "+91 90322 92421";
+  const mainEmail = settings?.contactEmail || "contact@srikrishnadhaba.com";
+  const cleanPhone = mainPhone.replace(/[^0-9]/g, "");
+  const whatsappNum = settings?.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, "") : "919032292421";
 
   return (
     <div className="min-h-screen pt-28 pb-20 relative bg-brand-bg">
@@ -61,7 +87,7 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* WhatsApp */}
             <a
-              href="https://wa.me/919032292421"
+              href={`https://wa.me/${whatsappNum}`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white rounded-2xl p-6 shadow-sm border border-brand-gold/10 hover:shadow-md transition-all duration-300 flex flex-col items-center text-center group"
@@ -109,26 +135,26 @@ export default function ContactPage() {
 
             {/* Call Us */}
             <a
-              href="tel:+919032292421"
+              href={`tel:${cleanPhone}`}
               className="bg-white rounded-2xl p-6 shadow-sm border border-brand-gold/10 hover:shadow-md transition-all duration-300 flex flex-col items-center text-center group"
             >
               <div className="w-12 h-12 rounded-full bg-amber-50 text-brand-gold flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <Phone size={20} className="fill-brand-gold/10" />
               </div>
               <h3 className="font-sans font-bold text-brand-dark text-sm">Call Us</h3>
-              <p className="text-xs text-brand-accent font-bold mt-1">+91 90322 92421</p>
+              <p className="text-xs text-brand-accent font-bold mt-1">{mainPhone}</p>
             </a>
 
             {/* Mail Us */}
             <a
-              href="mailto:contact@srikrishnadhaba.com"
+              href={`mailto:${mainEmail}`}
               className="bg-white rounded-2xl p-6 shadow-sm border border-brand-gold/10 hover:shadow-md transition-all duration-300 flex flex-col items-center text-center sm:col-span-2 group"
             >
               <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <Mail size={20} />
               </div>
               <h3 className="font-sans font-bold text-brand-dark text-sm">Mail Us</h3>
-              <p className="text-xs text-brand-dark/65 mt-1 font-medium">contact@srikrishnadhaba.com</p>
+              <p className="text-xs text-brand-dark/65 mt-1 font-medium">{mainEmail}</p>
             </a>
           </div>
 
