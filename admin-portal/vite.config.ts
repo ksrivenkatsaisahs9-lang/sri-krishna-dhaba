@@ -8,13 +8,11 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  base: '/admin/',
   server: {
-    proxy: {
-      '/admin': {
-        target: 'http://localhost:5174',
-        changeOrigin: true
-      }
+    port: 5174,
+    fs: {
+      allow: ['..']
     }
   }
 })
-

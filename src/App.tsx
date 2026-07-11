@@ -1,4 +1,4 @@
-import { HashRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
@@ -9,16 +9,11 @@ import GalleryPage from "./pages/GalleryPage";
 import ContactPage from "./pages/ContactPage";
 import ReviewsPage from "./pages/ReviewsPage";
 import BookTable from "./pages/BookTable";
-import AdminPortal from "./pages/AdminPortal";
-import PremiumAdmin from "./pages/PremiumAdmin";
 
 function AppContent() {
-  const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith("/admin");
-
   return (
     <div className="flex flex-col min-h-screen">
-      {!isAdminRoute && <Navbar />}
+      <Navbar />
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -28,11 +23,9 @@ function AppContent() {
           <Route path="/reviews" element={<ReviewsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/book-table" element={<BookTable />} />
-          <Route path="/admin/premium" element={<PremiumAdmin />} />
-          <Route path="/admin/*" element={<AdminPortal />} />
         </Routes>
       </main>
-      {!isAdminRoute && <Footer />}
+      <Footer />
     </div>
   );
 }

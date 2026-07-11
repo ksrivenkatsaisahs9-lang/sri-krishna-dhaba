@@ -5,9 +5,9 @@ import {
   CheckSquare, RefreshCw, Send, Lock
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
-import { db } from "../utils/db";
-import type { Booking, Review, GalleryItem, ContactInquiry, RestaurantSettings } from "../utils/db";
-import type { Dish } from "../components/DishCard";
+import { db } from "../../../src/utils/db";
+import type { Booking, Review, GalleryItem, ContactInquiry, RestaurantSettings } from "../../../src/utils/db";
+import type { Dish } from "../../../src/components/DishCard";
 
 const categories = [
   "SOUPS",
@@ -591,7 +591,7 @@ export default function AdminPortal() {
                   <div className="bg-white rounded-3xl p-6 border border-brand-gold/10 shadow-sm space-y-4">
                     <h3 className="font-display font-bold text-sm text-brand-dark uppercase tracking-wider">Popular Dining Times</h3>
                     <div className="space-y-3">
-                      {analytics.busiestHours.map((slot, idx) => (
+                      {analytics.busiestHours.map((slot: any, idx: number) => (
                         <div key={slot.time} className="flex justify-between items-center text-xs">
                           <div className="flex items-center gap-2">
                             <span className="w-5 h-5 rounded bg-brand-bg border border-brand-gold/10 text-brand-dark font-black flex items-center justify-center text-[10px]">{idx + 1}</span>
