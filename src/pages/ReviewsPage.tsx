@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
-import { Star, Search, SlidersHorizontal, MessageSquarePlus, CheckCircle2, AlertCircle } from "lucide-react";
+import { Star, Search, SlidersHorizontal, MessageSquarePlus, CheckCircle2, AlertCircle, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import TestimonialCard from "../components/TestimonialCard";
 
 interface Review {
   id: string;
@@ -83,6 +84,7 @@ export default function ReviewsPage() {
   const [sortBy, setSortBy] = useState<"recent" | "high" | "low">("recent");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
 
   const [newReview, setNewReview] = useState({
     name: "",
@@ -286,54 +288,47 @@ export default function ReviewsPage() {
         </div>
 
         {/* Review list */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <AnimatePresence mode="popLayout">
-            {filteredReviews.map((review) => (
-              <motion.div
-                key={review.id}
-                layout
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="glass-panel p-6 rounded-2xl border border-brand-gold/15 shadow-sm flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="flex space-x-0.5">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          size={14}
-                          className={
-                            i < review.rating
-                              ? "text-brand-gold fill-brand-gold"
-                              : "text-brand-dark/15"
-                          }
+        <div className="space-y-6 overflow-hidden py-4">
+          {filteredReviews.length === 0 ? (
+            <div className="text-center py-12 text-brand-dark/50 font-sans">
+              No reviews found matching your criteria.
+            </div>
+          ) : (
+            <>
+              {/* Row 1: Scrolling Left */}
+              <div className="marquee-container flex gap-6 overflow-hidden py-2 relative">
+                <div className="marquee-content flex gap-6 animate-marquee-left shrink-0">
+                  {Array.from({ length: Math.ceil(10 / filteredReviews.length) + 1 })
+                    .flatMap(() => filteredReviews)
+                    .map((review, idx) => (
+                      <TestimonialCard
+                        key={`row1-${review.id}-${idx}`}
+                        testimonial={review}
+                        onClick={() => setSelectedReview(review)}
+                      />
+                    ))}
+                </div>
+              </div>
+
+              {/* Row 2: Scrolling Right */}
+              {filteredReviews.length > 2 && (
+                <div className="marquee-container flex gap-6 overflow-hidden py-2 relative">
+                  <div className="marquee-content flex gap-6 animate-marquee-right shrink-0">
+                    {Array.from({ length: Math.ceil(10 / filteredReviews.length) + 1 })
+                      .flatMap(() => filteredReviews)
+                      .reverse()
+                      .map((review, idx) => (
+                        <TestimonialCard
+                          key={`row2-${review.id}-${idx}`}
+                          testimonial={review}
+                        onClick={() => setSelectedReview(review)}
                         />
                       ))}
-                    </div>
-                    <span className="text-[9px] bg-brand-accent/10 text-brand-accent px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                      {review.source}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-brand-dark/80 leading-relaxed font-sans mb-4 italic">
-                    "{review.quote}"
-                  </p>
-                </div>
-
-                <div className="flex items-center space-x-3 pt-3 border-t border-brand-dark/5 mt-auto">
-                  <div className="w-10 h-10 rounded-full bg-brand-accent/15 border border-brand-gold/20 flex items-center justify-center font-bold text-brand-accent font-display text-sm shrink-0">
-                    {review.avatar}
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-xs text-brand-dark truncate">{review.name}</h4>
-                    <p className="text-[9px] text-brand-dark/50 truncate mt-0.5">{review.role} • {review.date}</p>
                   </div>
                 </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+              )}
+            </>
+          )}
         </div>
 
         {/* Form Modal */}
@@ -358,7 +353,7 @@ export default function ReviewsPage() {
                   onClick={() => setIsFormOpen(false)}
                   className="absolute top-4 right-4 w-8 h-8 rounded-full bg-brand-dark/10 hover:bg-brand-accent hover:text-brand-bg flex items-center justify-center text-brand-dark transition-colors duration-300"
                 >
-                  <Star size={14} className="rotate-45" /> {/* fallback closer sign */}
+                  <X size={16} />
                 </button>
 
                 <AnimatePresence mode="wait">
@@ -434,6 +429,72 @@ export default function ReviewsPage() {
                     </div>
                   )}
                 </AnimatePresence>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Review Detail Modal */}
+        <AnimatePresence>
+          {selectedReview && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelectedReview(null)}
+                className="absolute inset-0 bg-brand-dark/60 backdrop-blur-md"
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="relative w-full max-w-lg bg-brand-bg rounded-3xl p-8 shadow-2xl border border-brand-gold/25 z-10"
+              >
+                <button
+                  onClick={() => setSelectedReview(null)}
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-brand-dark/10 hover:bg-brand-accent hover:text-brand-bg flex items-center justify-center text-brand-dark transition-colors duration-300"
+                >
+                  <X size={16} />
+                </button>
+
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-12 h-12 rounded-full bg-brand-accent/10 border border-brand-gold/20 flex items-center justify-center font-bold text-brand-accent font-display text-base">
+                    {selectedReview.avatar}
+                  </div>
+                  <div>
+                    <h3 className="font-display font-extrabold text-brand-dark text-base">{selectedReview.name}</h3>
+                    <p className="text-xs text-brand-dark/65">{selectedReview.role}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex space-x-0.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        size={18}
+                        className={
+                          i < selectedReview.rating
+                            ? "text-brand-gold fill-brand-gold"
+                            : "text-brand-dark/15"
+                        }
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs text-brand-accent bg-brand-accent/10 px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+                    {selectedReview.source}
+                  </span>
+                </div>
+
+                <p className="text-sm text-brand-dark/85 leading-relaxed italic font-sans mb-6">
+                  "{selectedReview.quote}"
+                </p>
+
+                <div className="text-xs text-brand-dark/50 border-t border-brand-dark/10 pt-4 flex justify-between">
+                  <span>Dined: {selectedReview.date}</span>
+                  <span>Verified Visitor</span>
+                </div>
               </motion.div>
             </div>
           )}

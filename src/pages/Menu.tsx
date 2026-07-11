@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Search, SlidersHorizontal, Star, Sparkles, ReceiptText } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import DishCard from "../components/DishCard";
 import { getNumericPrice } from "../utils/menuHelpers";

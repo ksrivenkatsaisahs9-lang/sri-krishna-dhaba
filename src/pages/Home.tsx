@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Star, Clock, Phone, MapPin, ShieldCheck, Flame, Leaf, X, Mail, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import SteamEffect from "../components/SteamEffect";
+import { ArrowRight, Star, Clock, Phone, MapPin, X, Mail, MessageCircle, ChevronDown } from "lucide-react";
 import DishCard from "../components/DishCard";
 import TestimonialCard, { type Testimonial } from "../components/TestimonialCard";
 import { menuData } from "../utils/menuData";
@@ -31,22 +30,18 @@ const branches: Branch[] = [
   },
   {
     id: "aziznagar",
-    name: "Sri Krishna Dhaba - Aziz Nagar",
+    name: "Balaji Chilkur Dhaba",
     address:
-      "4-15/2part, Aziz Nagar, Himayat Sagar Rd, Moinabad, Aziz Nagar, Himayat Sagar Rd, Moinabad, Telangana 500075",
+      "4-15/2part,Aziz Nagar,Himayth Sagar Rd,Moinabad Aziz Nagar, Himayat Sagar Rd, Moinabad, Telangana 500075",
     phone: "+91 90322 92421",
     hours: "Mon – Sun: 11:00 AM – 11:30 PM",
     mapSrc:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3808.7!2d78.35!3d17.35!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTfCsDIxJzAwLjAiTiA3OMKwMjEnMDAuMCJF!5e0!3m2!1sen!2sin!4v1704481029192!5m2!1sen!2sin",
-    googleMapsUrl: "https://maps.google.com/?q=Sri+Krishna+Family+Dhaba+Aziz+Nagar+Moinabad+Telangana"
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3808.7!2d78.3184651!3d17.3484252!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0xbf2c80be0a597a76!2sBalaji%20Chilkur%20Family%20Dhaba!5e0!3m2!1sen!2sin!4v1704481029192!5m2!1sen!2sin",
+    googleMapsUrl: "https://www.google.com/maps/place/Balaji+Chilkur+Family+Dhaba/@17.3484252,78.3184651,15z/data=!4m2!3m1!1s0x0:0xbf2c80be0a597a76?sa=X"
   }
 ];
 
-const heroImages = [
-  "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=80", // Biryani
-  "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=800&auto=format&fit=crop&q=80", // Paneer Tikka
-  "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=800&auto=format&fit=crop&q=80"  // Naan
-];
+
 
 const testimonials: Testimonial[] = [
   {
@@ -113,18 +108,17 @@ const testimonials: Testimonial[] = [
 
 export default function Home() {
   const navigate = useNavigate();
-  const [activeHeroIdx, setActiveHeroIdx] = useState(0);
   const [selectedReview, setSelectedReview] = useState<Testimonial | null>(null);
   const [activeBranch, setActiveBranch] = useState<string>("pragathinagar");
 
   const currentBranch = branches.find((b) => b.id === activeBranch)!;
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveHeroIdx((prev) => (prev + 1) % heroImages.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
+  const scrollToNext = () => {
+    const nextSection = document.getElementById("signature-dishes");
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   const signatureDishes = [
     menuData.find((dish) => dish.id === "spl-starter-7"), // Dragon Paneer
@@ -134,12 +128,12 @@ export default function Home() {
   ].filter((dish): dish is NonNullable<typeof dish> => !!dish);
 
   return (
-    <div className="relative pt-20">
+    <div className="relative pt-0 md:pt-20">
       {/* Noise Overlay */}
       <div className="noise-overlay" />
 
       {/* Hero Section (Clean Video Displayer Showcase) */}
-      <section className="relative w-full aspect-video md:min-h-[80vh] bg-brand-dark overflow-hidden z-10">
+      <section className="relative w-full h-[100dvh] md:h-auto md:aspect-video md:min-h-[80vh] bg-brand-dark overflow-hidden z-10 snap-child">
         <video
           autoPlay
           loop
@@ -148,16 +142,33 @@ export default function Home() {
           className="w-full h-full object-cover"
         >
           <source 
-            src="/videos/dhaba-promo.mp4" 
+            src="https://res.cloudinary.com/or5e9kak/video/upload/v1783771254/WhatsApp_Video_2026-07-11_at_10.04.14_dnyzq3.mp4" 
             type="video/mp4" 
           />
           Your browser does not support the video tag.
         </video>
+
+        {/* Scroll Down Indicator for Mobile */}
+        <div 
+          onClick={scrollToNext}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 md:hidden flex flex-col items-center gap-1.5 cursor-pointer group"
+        >
+          <span className="text-[10px] font-bold tracking-widest text-white/70 uppercase group-hover:text-brand-gold transition-colors duration-300">
+            Scroll Down
+          </span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="text-white/70 group-hover:text-brand-gold transition-colors duration-300"
+          >
+            <ChevronDown size={20} />
+          </motion.div>
+        </div>
       </section>
 
 
       {/* Signature Dishes Showcase */}
-      <section className="py-24 bg-brand-bg">
+      <section id="signature-dishes" className="py-24 bg-brand-bg snap-child">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-start mb-12">
             <span className="text-xs font-bold uppercase tracking-widest text-brand-accent block mb-2">Our Masterpieces</span>
@@ -291,9 +302,6 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
           <div className="text-center mb-16 space-y-2">
-            <span className="text-[11px] font-extrabold uppercase tracking-widest text-brand-accent">
-              GET IN TOUCH
-            </span>
             <h2 className="font-display font-bold text-4xl sm:text-5xl text-brand-dark relative pb-4 inline-block">
               Contact Us
               <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-brand-accent rounded-full" />
@@ -543,10 +551,10 @@ export default function Home() {
                   src={currentBranch.mapSrc}
                   className="border-0 absolute"
                   style={{
-                    width: 'calc(100% + 20px)',
-                    height: 'calc(100% + 80px)',
-                    top: '-75px',
-                    left: '-10px'
+                    width: 'calc(100% + 40px)',
+                    height: 'calc(100% + 200px)',
+                    top: '-160px',
+                    left: '-20px'
                   }}
                   allowFullScreen={false}
                   loading="lazy"

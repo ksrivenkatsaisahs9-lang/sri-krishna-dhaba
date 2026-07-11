@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Star, X, Check, Heart, ShieldAlert, Sparkles, ShoppingBag, MessageCircle } from "lucide-react";
+import { Star, X, Heart, ShieldAlert, Sparkles, ShoppingBag, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { formatPrice, getNumericPrice } from "../utils/menuHelpers";
+import { formatPrice } from "../utils/menuHelpers";
 
 export interface Dish {
   id: string;
@@ -28,7 +28,7 @@ interface DishCardProps {
 export default function DishCard({ dish, onClickOverride, showImage = false }: DishCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  const [ordered, setOrdered] = useState(false);
+  const ordered = false;
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   const handleOrder = (e: React.MouseEvent) => {

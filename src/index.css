@@ -116,3 +116,16 @@ body {
   left: 0;
   right: 0;
 }
+
+/* Scroll Snapping for Mobile */
+@media (max-width: 768px) {
+  html {
+    scroll-snap-type: y proximity;
+    scroll-behavior: smooth;
+    scroll-padding-top: 70px; /* Accounts for the fixed navbar height */
+  }
+  .snap-child {
+    scroll-snap-align: start;
+  }
+}
+

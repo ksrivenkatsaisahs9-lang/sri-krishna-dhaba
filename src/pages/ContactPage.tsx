@@ -25,14 +25,14 @@ const branches: Branch[] = [
   },
   {
     id: "aziznagar",
-    name: "Sri Krishna Dhaba - Aziz Nagar",
+    name: "Balaji Chilkur Dhaba",
     address:
-      "4-15/2part, Aziz Nagar, Himayat Sagar Rd, Moinabad, Aziz Nagar, Himayat Sagar Rd, Moinabad, Telangana 500075",
+      "4-15/2part,Aziz Nagar,Himayth Sagar Rd,Moinabad Aziz Nagar, Himayat Sagar Rd, Moinabad, Telangana 500075",
     phone: "+91 90322 92421",
     hours: "Mon – Sun: 11:00 AM – 11:30 PM",
     mapSrc:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3808.7!2d78.35!3d17.35!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTfCsDIxJzAwLjAiTiA3OMKwMjEnMDAuMCJF!5e0!3m2!1sen!2sin!4v1704481029192!5m2!1sen!2sin",
-    googleMapsUrl: "https://maps.google.com/?q=Sri+Krishna+Family+Dhaba+Aziz+Nagar+Moinabad+Telangana"
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3808.7!2d78.3184651!3d17.3484252!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0xbf2c80be0a597a76!2sBalaji%20Chilkur%20Family%20Dhaba!5e0!3m2!1sen!2sin!4v1704481029192!5m2!1sen!2sin",
+    googleMapsUrl: "https://www.google.com/maps/place/Balaji+Chilkur+Family+Dhaba/@17.3484252,78.3184651,15z/data=!4m2!3m1!1s0x0:0xbf2c80be0a597a76?sa=X"
   }
 ];
 
@@ -49,9 +49,6 @@ export default function ContactPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-16 space-y-2">
-          <span className="text-[11px] font-extrabold uppercase tracking-widest text-brand-accent">
-            GET IN TOUCH
-          </span>
           <h1 className="font-display font-bold text-4xl sm:text-5xl text-brand-dark relative pb-4 inline-block">
             Contact Us
             <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-brand-accent rounded-full" />
@@ -301,10 +298,10 @@ export default function ContactPage() {
                 src={currentBranch.mapSrc}
                 className="border-0 absolute"
                 style={{
-                  width: 'calc(100% + 20px)',
-                  height: 'calc(100% + 80px)',
-                  top: '-75px',
-                  left: '-10px'
+                  width: 'calc(100% + 40px)',
+                  height: 'calc(100% + 200px)',
+                  top: '-160px',
+                  left: '-20px'
                 }}
                 allowFullScreen={false}
                 loading="lazy"

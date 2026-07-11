@@ -24,43 +24,37 @@ const galleryItems: GalleryItem[] = [
   },
   {
     id: "g-3",
-    url: "https://images.unsplash.com/photo-1601050690597-df056fb4ce78?w=800&auto=format&fit=crop&q=80",
+    url: "/images/gallery-naan-types.jpg",
     category: "Tandoor",
-    title: "Freshly Pulled Butter Naan"
-  },
-  {
-    id: "g-4",
-    url: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800&auto=format&fit=crop&q=80",
-    category: "Sweets",
-    title: "Delicious Cardamom Gulab Jamun"
+    title: "Different Naan Types (Kashmiri, Plain, Butter, Garlic)"
   },
   {
     id: "g-5",
-    url: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&auto=format&fit=crop&q=80",
+    url: "/images/gallery-dish-paneer.jpg",
     category: "Dishes",
-    title: "Spicy Veg Manchurian Balls"
-  },
-  {
-    id: "g-6",
-    url: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&auto=format&fit=crop&q=80",
-    category: "Dishes",
-    title: "Classic Punjabi Chana Masala"
+    title: "Paneer Butter Masala & Butter Naan Combo"
   },
   {
     id: "g-7",
-    url: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80",
+    url: "/images/gallery-ambience-1.jpg",
     category: "Ambience",
-    title: "Cozy Family Seat Layout"
+    title: "Premium Family Dining Area"
   },
   {
     id: "g-8",
-    url: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&auto=format&fit=crop&q=80",
+    url: "/images/gallery-ambience-2.jpg",
     category: "Ambience",
-    title: "Dhaba Style Warm Lighting"
+    title: "Cozy Dining with Artistic Decor"
+  },
+  {
+    id: "g-9",
+    url: "/images/gallery-ambience-3.jpg",
+    category: "Ambience",
+    title: "Spacious Banquet Seating Layout"
   }
 ];
 
-const categories = ["All", "Dishes", "Tandoor", "Sweets", "Ambience"];
+const categories = ["All", "Dishes", "Tandoor", "Ambience"];
 
 export default function GalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
