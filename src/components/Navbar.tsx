@@ -85,21 +85,29 @@ export default function Navbar() {
               })}
             </div>
 
-            {/* Right Side Buttons (Call Now & Order Online) */}
-            <div className="hidden md:flex items-center space-x-4 shrink-0">
+            {/* Right Side Buttons (Call Now, Book Table & Order Online) */}
+            <div className="hidden md:flex items-center space-x-3 shrink-0">
               {/* Call Now Outline Button */}
               <a
                 href="tel:+919032292421"
-                className="flex items-center gap-1.5 border border-brand-dark/40 hover:border-brand-dark text-brand-dark hover:bg-brand-dark hover:text-brand-bg text-[10px] xl:text-xs font-bold tracking-widest uppercase px-5 py-2.5 rounded-full transition-all duration-300 shadow-sm"
+                className="flex items-center gap-1.5 border border-brand-dark/40 hover:border-brand-dark text-brand-dark hover:bg-brand-dark hover:text-brand-bg text-[10px] xl:text-xs font-bold tracking-widest uppercase px-4 py-2.5 rounded-full transition-all duration-300 shadow-sm"
               >
                 <Phone size={13} />
                 <span>Call Now</span>
               </a>
 
+              {/* Book Table Filled Button */}
+              <Link
+                to="/book-table"
+                className="flex items-center gap-1.5 bg-brand-accent hover:bg-brand-dark text-brand-bg hover:text-brand-bg text-[10px] xl:text-xs font-bold tracking-widest uppercase px-4 py-2.5 rounded-full transition-all duration-300 shadow-md border border-brand-accent/10"
+              >
+                <span>Book Table</span>
+              </Link>
+
               {/* Order Online Filled Button */}
               <Link
                 to="/menu"
-                className="flex items-center gap-1.5 bg-brand-gold hover:bg-brand-dark text-brand-dark hover:text-brand-bg text-[10px] xl:text-xs font-bold tracking-widest uppercase px-5 py-2.5 rounded-full transition-all duration-300 shadow-md border border-brand-gold/10"
+                className="flex items-center gap-1.5 bg-brand-gold hover:bg-brand-dark text-brand-dark hover:text-brand-bg text-[10px] xl:text-xs font-bold tracking-widest uppercase px-4 py-2.5 rounded-full transition-all duration-300 shadow-md border border-brand-gold/10"
               >
                 <ShoppingBag size={13} />
                 <span>Order Online</span>
@@ -196,19 +204,26 @@ export default function Navbar() {
             </div>
 
             {/* Bottom Row inside overlay */}
-            <div className="pt-6 border-t border-brand-dark/10 flex flex-col gap-3.5">
+            <div className="pt-6 border-t border-brand-dark/10 flex flex-col gap-3">
               <a
                 href="tel:+919032292421"
                 onClick={() => setIsOpen(false)}
-                className="w-full flex items-center justify-center gap-2 border border-brand-dark text-brand-dark hover:bg-brand-dark hover:text-brand-bg text-xs font-bold tracking-widest uppercase py-4 rounded-full transition-all duration-300"
+                className="w-full flex items-center justify-center gap-2 border border-brand-dark text-brand-dark hover:bg-brand-dark hover:text-brand-bg text-xs font-bold tracking-widest uppercase py-3.5 rounded-full transition-all duration-300"
               >
                 <Phone size={15} />
                 <span>Call Now</span>
               </a>
               <Link
+                to="/book-table"
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center justify-center gap-2 bg-brand-accent text-brand-bg text-xs font-bold tracking-widest uppercase py-3.5 rounded-full transition-all duration-300 shadow-md border border-brand-accent/10"
+              >
+                <span>Book Table</span>
+              </Link>
+              <Link
                 to="/menu"
                 onClick={() => setIsOpen(false)}
-                className="w-full flex items-center justify-center gap-2 bg-brand-gold text-brand-dark text-xs font-bold tracking-widest uppercase py-4 rounded-full transition-all duration-300 shadow-md"
+                className="w-full flex items-center justify-center gap-2 bg-brand-gold text-brand-dark text-xs font-bold tracking-widest uppercase py-3.5 rounded-full transition-all duration-300 shadow-md"
               >
                 <ShoppingBag size={15} />
                 <span>Order Online</span>

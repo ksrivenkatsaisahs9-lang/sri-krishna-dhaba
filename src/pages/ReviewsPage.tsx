@@ -1,84 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Star, Search, SlidersHorizontal, MessageSquarePlus, CheckCircle2, AlertCircle, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import TestimonialCard from "../components/TestimonialCard";
-
-interface Review {
-  id: string;
-  name: string;
-  role: string;
-  rating: number;
-  quote: string;
-  date: string;
-  source: string;
-  avatar: string;
-}
-
-const initialReviews: Review[] = [
-  {
-    id: "rev-1",
-    name: "Venkata Ratnam Rayala",
-    role: "Local Guide • 1,288 reviews • 38,138 photos",
-    rating: 5,
-    quote: "I ordered a Paneer Chatpata, Butter Naan, Garlic Naan and Butter Roti from this place. Food was good (both quality and quantity wise) Family atmosphere and good staff.",
-    date: "8 months ago",
-    source: "Google Reviews",
-    avatar: "VR"
-  },
-  {
-    id: "rev-2",
-    name: "K Monesh Chary",
-    role: "Local Guide • 6 reviews • 4 photos",
-    rating: 4,
-    quote: "Nice restaurant with good ambience lighting need to bit more. Food was very tasty, and service is quick. Worth visiting with families.",
-    date: "4 months ago",
-    source: "Google Reviews",
-    avatar: "KM"
-  },
-  {
-    id: "rev-3",
-    name: "Sai Kumar",
-    role: "2 reviews • 9 photos",
-    rating: 4,
-    quote: "Ordered Paneer Biryani and Tandoori Roti. The quantity was massive and the taste was authentic. Great experience in Pragathi Nagar.",
-    date: "4 months ago",
-    source: "Google Reviews",
-    avatar: "SK"
-  },
-  {
-    id: "rev-4",
-    name: "Jyothi Reddy",
-    role: "Verified Diner",
-    rating: 5,
-    quote: "Excellent pure veg family dhaba on HMT road. Extremely hygienic and the staff is really humble. Highly recommended!",
-    date: "2 months ago",
-    source: "Swiggy",
-    avatar: "JR"
-  },
-  {
-    id: "rev-5",
-    name: "Abhinav Rao",
-    role: "Foodie Guide",
-    rating: 5,
-    quote: "The Gobi 65 and Chana Masala were spot on. Real clay oven tandoor roti taste, which is hard to find in local restaurants here.",
-    date: "1 month ago",
-    source: "Zomato",
-    avatar: "AR"
-  },
-  {
-    id: "rev-6",
-    name: "Priya Darshini",
-    role: "Local Guide",
-    rating: 4,
-    quote: "Comforting food. The Sweet Tomato Soup and Sweet Lassi are a must-try. Safe and friendly environment for kids and elderly.",
-    date: "3 weeks ago",
-    source: "Google Reviews",
-    avatar: "PD"
-  }
-];
+import { db } from "../utils/db";
+import type { Review } from "../utils/db";
 
 export default function ReviewsPage() {
-  const [reviews, setReviews] = useState<Review[]>(initialReviews);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [ratingFilter, setRatingFilter] = useState<number | "All">("All");
   const [sortBy, setSortBy] = useState<"recent" | "high" | "low">("recent");
@@ -95,11 +23,20 @@ export default function ReviewsPage() {
 
   const [formError, setFormError] = useState("");
 
+  const loadReviews = () => {
+    // Show only Approved reviews on public page
+    setReviews(db.getReviews().filter((r) => r.status === "Approved"));
+  };
+
+  useEffect(() => {
+    loadReviews();
+  }, []);
+
   // Calculate statistics
   const stats = useMemo(() => {
     const total = reviews.length;
     const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-    const average = (sum / total).toFixed(1);
+    const average = total > 0 ? (sum / total).toFixed(1) : "0.0";
 
     const counts = [0, 0, 0, 0, 0]; // 5 to 1 star counts
     reviews.forEach((r) => {
@@ -127,7 +64,12 @@ export default function ReviewsPage() {
     }
 
     if (sortBy === "recent") {
-      // Keep initial order or sort if dates are parsed, we will keep index
+      // Sort pinned reviews first, then keep list order (newest first in localStorage)
+      result.sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        return 0;
+      });
     } else if (sortBy === "high") {
       result.sort((a, b) => b.rating - a.rating);
     } else if (sortBy === "low") {
@@ -144,18 +86,14 @@ export default function ReviewsPage() {
       return;
     }
 
-    const reviewObj: Review = {
-      id: `rev-custom-${Date.now()}`,
+    db.addReview({
       name: newReview.name,
       role: "Guest Reviewer",
       rating: newReview.rating,
       quote: newReview.quote,
-      date: "Just now",
-      source: "Website Guest",
-      avatar: newReview.name.substring(0, 2).toUpperCase()
-    };
+      source: "Website Guest"
+    });
 
-    setReviews([reviewObj, ...reviews]);
     setFormSubmitted(true);
     setFormError("");
 
@@ -163,8 +101,10 @@ export default function ReviewsPage() {
       setIsFormOpen(false);
       setFormSubmitted(false);
       setNewReview({ name: "", rating: 5, quote: "", source: "Website Guest" });
+      loadReviews();
     }, 2000);
   };
+
 
   return (
     <div className="min-h-screen pt-28 pb-20 relative bg-brand-bg/30">

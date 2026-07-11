@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Star, Clock, Phone, MapPin, X, Mail, MessageCircle, ChevronDown } from "lucide-react";
 import DishCard from "../components/DishCard";
-import TestimonialCard, { type Testimonial } from "../components/TestimonialCard";
-import { menuData } from "../utils/menuData";
+import TestimonialCard from "../components/TestimonialCard";
+import { db } from "../utils/db";
+import type { Review } from "../utils/db";
+import type { Dish } from "../components/DishCard";
 
 interface Branch {
   id: string;
@@ -43,73 +45,32 @@ const branches: Branch[] = [
 
 
 
-const testimonials: Testimonial[] = [
-  {
-    id: "rev-1",
-    name: "Venkata Ratnam Rayala",
-    role: "Local Guide • 1,288 reviews",
-    avatar: "VR",
-    rating: 5,
-    quote: "Food was good (both quality and quantity wise) Family atmosphere and good staff. We ordered Paneer Chatpata, Butter Naan, Garlic Naan and Butter Roti from this place. Highly satisfied!",
-    date: "8 months ago",
-    source: "Google Reviews"
-  },
-  {
-    id: "rev-2",
-    name: "K Monesh Chary",
-    role: "Local Guide",
-    avatar: "KM",
-    rating: 4,
-    quote: "Nice restaurant with good ambience lighting need to bit more. Food was very tasty, and service is quick. Worth visiting with families.",
-    date: "4 months ago",
-    source: "Google Reviews"
-  },
-  {
-    id: "rev-3",
-    name: "Sai Kumar",
-    role: "2 reviews • 9 photos",
-    avatar: "SK",
-    rating: 4,
-    quote: "Ordered Paneer Biryani and Tandoori Roti. The quantity was massive and the taste was authentic. Great experience in Pragathi Nagar.",
-    date: "4 months ago",
-    source: "Google Reviews"
-  },
-  {
-    id: "rev-4",
-    name: "Jyothi Reddy",
-    role: "Verified Customer",
-    avatar: "JR",
-    rating: 5,
-    quote: "Excellent pure veg family dhaba on HMT road. Extremely hygienic and the staff is really humble. Highly recommended!",
-    date: "2 months ago",
-    source: "Swiggy"
-  },
-  {
-    id: "rev-5",
-    name: "Abhinav Rao",
-    role: "Foodie Guide",
-    avatar: "AR",
-    rating: 5,
-    quote: "The Gobi 65 and Chana Masala were spot on. Real clay oven tandoor roti taste, which is hard to find in local restaurants here.",
-    date: "1 month ago",
-    source: "Zomato"
-  },
-  {
-    id: "rev-6",
-    name: "Priya Darshini",
-    role: "Local Guide",
-    avatar: "PD",
-    rating: 4,
-    quote: "Comforting food. The Sweet Tomato Soup and Sweet Lassi are a must-try. Safe and friendly environment for kids and elderly.",
-    date: "3 weeks ago",
-    source: "Google Reviews"
-  }
-];
+// Testimonials loaded dynamically from database
 
 export default function Home() {
   const navigate = useNavigate();
-  const [selectedReview, setSelectedReview] = useState<Testimonial | null>(null);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [activeBranch, setActiveBranch] = useState<string>("pragathinagar");
+  const [signatureDishes, setSignatureDishes] = useState<Dish[]>([]);
+  const [testimonials, setTestimonials] = useState<Review[]>([]);
+
+  useEffect(() => {
+    db.incrementWebsiteVisits();
+    
+    // Load Dynamic Menu Specials
+    const allMenu = db.getMenu();
+    const signatures = [
+      allMenu.find((dish) => dish.id === "spl-starter-7"),
+      allMenu.find((dish) => dish.id === "spl-starter-4"),
+      allMenu.find((dish) => dish.id === "starter-9"),
+      allMenu.find((dish) => dish.id === "biryani-6")
+    ].filter((dish): dish is Dish => !!dish);
+    setSignatureDishes(signatures);
+
+    // Load Approved Reviews
+    const approved = db.getReviews().filter((r) => r.status === "Approved");
+    setTestimonials(approved);
+  }, []);
 
   const currentBranch = branches.find((b) => b.id === activeBranch)!;
 
@@ -119,13 +80,6 @@ export default function Home() {
       nextSection.scrollIntoView({ behavior: "smooth" });
     }
   };
-
-  const signatureDishes = [
-    menuData.find((dish) => dish.id === "spl-starter-7"), // Dragon Paneer
-    menuData.find((dish) => dish.id === "spl-starter-4"), // Mushroom Butter Pepper
-    menuData.find((dish) => dish.id === "starter-9"),      // Baby Corn Majestic
-    menuData.find((dish) => dish.id === "biryani-6")      // Hyderabadi Biryani
-  ].filter((dish): dish is NonNullable<typeof dish> => !!dish);
 
   return (
     <div className="relative pt-0 md:pt-20">
@@ -147,6 +101,42 @@ export default function Home() {
           />
           Your browser does not support the video tag.
         </video>
+
+        {/* Exclusive Web Offer Card Overlaid on Video - Desktop */}
+        <div className="absolute top-28 right-8 z-20 hidden lg:block max-w-xs glass-panel-dark p-6 rounded-2xl border border-brand-gold/30 shadow-2xl">
+          <div className="flex items-center gap-2 mb-2 text-brand-gold">
+            <span className="bg-brand-accent/20 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-brand-accent/30">
+              10% OFF
+            </span>
+            <span className="text-[10px] font-bold tracking-widest uppercase">Web Exclusive</span>
+          </div>
+          <p className="text-xs text-brand-bg/90 leading-relaxed">
+            Reserve your table through our website and receive <strong className="text-brand-gold">10% OFF</strong> on your final dining bill!
+          </p>
+          <Link
+            to="/book-table"
+            className="mt-3.5 w-full inline-flex items-center justify-center bg-brand-gold hover:bg-brand-accent text-brand-dark hover:text-brand-bg text-[10px] font-extrabold tracking-widest uppercase py-2.5 rounded-xl transition-all duration-300"
+          >
+            Book Table Now
+          </Link>
+        </div>
+
+        {/* Floating Promo Banner - Mobile */}
+        <div className="absolute bottom-24 left-4 right-4 z-20 md:hidden glass-panel-dark p-4 rounded-xl border border-brand-gold/20 text-center shadow-lg">
+          <p className="text-[10px] font-black text-brand-gold uppercase tracking-wider mb-1">
+            🎁 WEB EXCLUSIVE OFFER — 10% DISCOUNT
+          </p>
+          <p className="text-[11px] text-brand-bg/90 leading-tight">
+            Reserve online and receive <strong className="text-brand-gold">10% OFF</strong> your final bill!
+          </p>
+          <Link
+            to="/book-table"
+            onClick={(e) => e.stopPropagation()}
+            className="mt-2 inline-block bg-brand-gold text-brand-dark text-[9px] font-extrabold tracking-widest uppercase px-4 py-1.5 rounded-lg"
+          >
+            Reserve Table
+          </Link>
+        </div>
 
         {/* Scroll Down Indicator for Mobile */}
         <div 
@@ -296,6 +286,50 @@ export default function Home() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* ──────────── ONLINE RESERVATION PROMOTION ──────────── */}
+      <section className="py-20 bg-brand-dark text-brand-bg relative overflow-hidden">
+        {/* Noise overlay */}
+        <div className="noise-overlay opacity-5" />
+        
+        <div className="max-w-4xl mx-auto px-6 text-center relative z-10 space-y-6">
+          <span className="text-[11px] font-black tracking-widest text-brand-gold uppercase bg-brand-gold/10 border border-brand-gold/20 px-3.5 py-1 rounded-full">
+            VIP Dining Experience
+          </span>
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-brand-bg tracking-tight">
+            Reserve Your Table
+          </h2>
+          
+          <div className="max-w-2xl mx-auto border border-brand-gold/30 bg-white/5 backdrop-blur-sm rounded-3xl p-8 my-4 relative">
+            {/* Corner gold borders */}
+            <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-brand-gold" />
+            <div className="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-brand-gold" />
+            <div className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-brand-gold" />
+            <div className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-brand-gold" />
+            
+            <p className="text-sm sm:text-base font-bold text-brand-gold tracking-wide uppercase mb-2">
+              🎁 WEBSITE EXCLUSIVE OFFER
+            </p>
+            <p className="text-base sm:text-lg md:text-xl font-display text-brand-bg/95 leading-relaxed italic">
+              "Reserve your table through our website and receive <span className="text-brand-gold font-bold">10% OFF</span> on your final dining bill."
+            </p>
+          </div>
+          
+          <p className="text-xs sm:text-sm text-brand-bg/75 max-w-lg mx-auto leading-relaxed">
+            Avoid wait times and get premium seating. Choose your preferred table layouts from our interactive dining map.
+          </p>
+          
+          <div className="pt-4">
+            <Link
+              to="/book-table"
+              className="inline-flex items-center gap-2 bg-brand-accent hover:bg-brand-gold text-white hover:text-brand-dark font-extrabold text-xs tracking-widest uppercase px-8 py-4.5 rounded-full shadow-lg transition-all duration-300"
+            >
+              <span>Reserve A Table Now</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* ──────────── CONTACT & DIRECTIONS SECTION ──────────── */}
       <section className="py-24 bg-brand-bg/60 border-t border-brand-gold/15">

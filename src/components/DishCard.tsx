@@ -17,6 +17,8 @@ export interface Dish {
   ingredients?: string[];
   allergens?: string[];
   prepTime?: string;
+  outOfStock?: boolean;
+  hidden?: boolean;
 }
 
 interface DishCardProps {
@@ -67,6 +69,13 @@ export default function DishCard({ dish, onClickOverride, showImage = false }: D
                 alt={dish.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
+              {dish.outOfStock && (
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center z-10">
+                  <span className="bg-rose-600 text-white font-display font-black text-xs uppercase tracking-widest px-4 py-1.5 rounded-lg shadow-lg border border-rose-500">
+                    OUT OF STOCK
+                  </span>
+                </div>
+              )}
               {/* Wishlist Button floated on Image */}
               <button
                 onClick={(e) => {
@@ -124,9 +133,14 @@ export default function DishCard({ dish, onClickOverride, showImage = false }: D
 
                 <button
                   onClick={handleOrder}
-                  className="bg-brand-accent hover:bg-brand-dark text-brand-bg text-xs font-bold px-5 py-2 rounded-full shadow-md transition-all duration-300"
+                  disabled={dish.outOfStock}
+                  className={`text-xs font-bold px-5 py-2 rounded-full shadow-md transition-all duration-300 ${
+                    dish.outOfStock 
+                      ? "bg-gray-200 text-gray-400 border border-gray-300 shadow-none cursor-not-allowed" 
+                      : "bg-brand-accent hover:bg-brand-dark text-brand-bg border border-brand-accent"
+                  }`}
                 >
-                  {ordered ? "Added!" : "Order Now"}
+                  {dish.outOfStock ? "Sold Out" : ordered ? "Added!" : "Order Now"}
                 </button>
               </div>
             </div>
@@ -137,9 +151,15 @@ export default function DishCard({ dish, onClickOverride, showImage = false }: D
             <div className="flex flex-col flex-grow min-w-0 pr-2">
               {/* Badge Row */}
               <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <span className="border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 text-[9px] font-bold tracking-wider px-2 py-0.5 rounded uppercase shrink-0">
-                  VEG
-                </span>
+                {dish.outOfStock ? (
+                  <span className="border border-rose-500/30 bg-rose-500/90 text-white text-[9px] font-bold tracking-wider px-2 py-0.5 rounded uppercase shrink-0">
+                    OUT OF STOCK
+                  </span>
+                ) : (
+                  <span className="border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 text-[9px] font-bold tracking-wider px-2 py-0.5 rounded uppercase shrink-0">
+                    VEG
+                  </span>
+                )}
                 {dish.isChefSpecial && (
                   <span className="bg-brand-accent/10 border border-brand-accent/25 text-brand-accent text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded flex items-center gap-1 shrink-0">
                     <Sparkles size={8} className="fill-brand-accent animate-pulse" />
@@ -190,9 +210,14 @@ export default function DishCard({ dish, onClickOverride, showImage = false }: D
               {/* Quick Add Button */}
               <button
                 onClick={handleOrder}
-                className="mt-2 bg-brand-accent/90 hover:bg-brand-accent text-brand-bg text-[11px] font-bold px-4 py-1.5 rounded-full shadow-sm transition-all duration-300 border border-transparent shrink-0"
+                disabled={dish.outOfStock}
+                className={`mt-2 text-[11px] font-bold px-4 py-1.5 rounded-full shadow-sm transition-all duration-300 border shrink-0 ${
+                  dish.outOfStock
+                    ? "bg-gray-200 text-gray-400 border-gray-300 shadow-none cursor-not-allowed"
+                    : "bg-brand-accent/90 hover:bg-brand-accent text-brand-bg border-transparent"
+                }`}
               >
-                {ordered ? "Added!" : "Order Now"}
+                {dish.outOfStock ? "Sold Out" : ordered ? "Added!" : "Order Now"}
               </button>
             </div>
           </>

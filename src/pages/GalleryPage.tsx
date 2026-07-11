@@ -1,58 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, ZoomIn, ZoomOut, ArrowLeft, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-interface GalleryItem {
-  id: string;
-  url: string;
-  category: "Dishes" | "Tandoor" | "Sweets" | "Ambience";
-  title: string;
-}
-
-const galleryItems: GalleryItem[] = [
-  {
-    id: "g-1",
-    url: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=80",
-    category: "Dishes",
-    title: "Paneer Biryani Dum Cooking"
-  },
-  {
-    id: "g-2",
-    url: "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=800&auto=format&fit=crop&q=80",
-    category: "Tandoor",
-    title: "Sizzling Paneer Tikka Platter"
-  },
-  {
-    id: "g-3",
-    url: "/images/gallery-naan-types.jpg",
-    category: "Tandoor",
-    title: "Different Naan Types (Kashmiri, Plain, Butter, Garlic)"
-  },
-  {
-    id: "g-5",
-    url: "/images/gallery-dish-paneer.jpg",
-    category: "Dishes",
-    title: "Paneer Butter Masala & Butter Naan Combo"
-  },
-  {
-    id: "g-7",
-    url: "/images/gallery-ambience-1.jpg",
-    category: "Ambience",
-    title: "Premium Family Dining Area"
-  },
-  {
-    id: "g-8",
-    url: "/images/gallery-ambience-2.jpg",
-    category: "Ambience",
-    title: "Cozy Dining with Artistic Decor"
-  },
-  {
-    id: "g-9",
-    url: "/images/gallery-ambience-3.jpg",
-    category: "Ambience",
-    title: "Spacious Banquet Seating Layout"
-  }
-];
+import { db } from "../utils/db";
+import type { GalleryItem } from "../utils/db";
 
 const categories = ["All", "Dishes", "Tandoor", "Ambience"];
 
@@ -60,6 +10,11 @@ export default function GalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const [scale, setScale] = useState(1);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+
+  useEffect(() => {
+    setGalleryItems(db.getGallery());
+  }, []);
 
   const filteredItems = galleryItems.filter(
     (item) => selectedCategory === "All" || item.category === selectedCategory
