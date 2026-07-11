@@ -10,6 +10,7 @@ import ContactPage from "./pages/ContactPage";
 import ReviewsPage from "./pages/ReviewsPage";
 import BookTable from "./pages/BookTable";
 import AdminPortal from "./pages/AdminPortal";
+import PremiumAdmin from "./pages/PremiumAdmin";
 
 function AppContent() {
   const location = useLocation();
@@ -27,6 +28,7 @@ function AppContent() {
           <Route path="/reviews" element={<ReviewsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/book-table" element={<BookTable />} />
+          <Route path="/admin/premium" element={<PremiumAdmin />} />
           <Route path="/admin/*" element={<AdminPortal />} />
         </Routes>
       </main>
